@@ -23,12 +23,34 @@ $newline never
         <script>
           document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/,'js');
     <body>
-        <div class="container">
+        <nav .navbar .navbar-inverse .navbar-fixed-top>
+            <div .container>
+                 <div .navbar-header>
+                     <button type="button" .navbar-toggle .collapsed data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                         <span class="sr-only">Toggle navigation
+                         <span class="icon-bar">
+                         <span class="icon-bar">
+                         <span class="icon-bar">
+                     <a .navbar-brand href=@{HomeR}>Isaac Ranks
+                 <div #navbar .navbar-collapse .collapse>
+                     <ul .nav .navbar-nav>
+                         <li>
+                             <a href=@{VoteR}>Vote
+                         <li>
+                             <a href=@{RanksR}>Ranks
+        <div .container>
             <header>
             <div id="main" role="main">
               ^{pageBody pc}
             <footer>
-                #{extraCopyright $ appExtra $ settings master}
+                Website © 2014 #
+                <a href="mailto:mithrandi@mithrandi.net">Tristan Seligmann
+                \ — I do not hold the copyright to any content from #
+                <a href="http://bindingofisaac.com/">The Binding of Isaac: Rebirth
+                \ — Special thanks to #
+                <a href="https://www.reddit.com/r/bindingofisaac/">/r/bindingofisaac
+                \ and #
+                <a href="http://platinumgod.co.uk/rebirth">platinumgod.co.uk
 
         $maybe analytics <- extraAnalytics $ appExtra $ settings master
             <script>

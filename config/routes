@@ -4,4 +4,6 @@
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
-/ HomeR GET POST
+/ HomeR GET
+/vote VoteR GET POST
+/ranks RanksR GET

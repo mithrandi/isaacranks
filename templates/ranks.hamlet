@@ -1,0 +1,18 @@
+$newline never
+<div .jumbotron>
+  <h1>Item ranks
+
+<table .table .table-responsive .table-hover>
+  <tr>
+    <th>##
+    <th>Item ID
+    <th>Name
+    <th>Description
+    <th>Rating
+  $forall (rank, Entity _ item) <- items
+    <tr>
+      <td>#{rank}
+      <td>#{itemIsaacId item}
+      <td>#{itemName item}
+      <td>#{itemDescription item}
+      <td>#{itemRating item}

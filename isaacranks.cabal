@@ -20,6 +20,7 @@ library
                      Settings.StaticFiles
                      Settings.Development
                      Handler.Home
+                     Handler.Vote
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -42,6 +43,7 @@ library
                 DeriveDataTypeable
                 ViewPatterns
                 TupleSections
+                FlexibleInstances
 
     build-depends: base                          >= 4          && < 5
                  , yesod                         >= 1.4.0      && < 1.5
@@ -69,6 +71,10 @@ library
                  , monad-logger                  >= 0.3        && < 0.4
                  , fast-logger                   >= 2.2        && < 2.3
                  , wai-logger                    >= 2.2        && < 2.3
+                 , time
+                 , http-types
+                 , random
+                 , random-shuffle
 
     -- see https://github.com/yesodweb/yesod/issues/814
     if !os(windows)

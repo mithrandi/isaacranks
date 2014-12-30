@@ -9,4 +9,15 @@ Email
     verkey Text Maybe
     UniqueEmail email
 
- -- By default this file is used in Model.hs (which is imported by Foundation.hs)
+Item json
+    isaacId Int
+    name Text
+    description Text
+    rating Double
+    votes Int
+    UniqueItem isaacId
+
+Vote json
+    winner ItemId
+    loser ItemId
+    timestamp UTCTime
