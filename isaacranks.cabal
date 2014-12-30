@@ -16,6 +16,7 @@ library
                      Foundation
                      Import
                      Model
+                     Helpers.Heroku
                      Settings
                      Settings.StaticFiles
                      Settings.Development
@@ -75,6 +76,7 @@ library
                  , http-types
                  , random
                  , random-shuffle
+                 , heroku
 
     -- see https://github.com/yesodweb/yesod/issues/814
     if !os(windows)
