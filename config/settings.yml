@@ -15,5 +15,5 @@ Staging:
   <<: *defaults
 
 Production:
-  #approot: "http://www.example.com"
+  approot: "https://mighty-sands-3614.herokuapp.com/"
   <<: *defaults
