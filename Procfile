@@ -1,1 +1,1 @@
-web: ./dist/build/isaacranks/isaacranks production -p $PORT
+web: /app/bin/isaacranks production -p $PORT
