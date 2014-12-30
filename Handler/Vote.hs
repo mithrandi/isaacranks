@@ -14,15 +14,16 @@ getVoteR = do
     setTitle "Isaac item ranks"
     $(widgetFile "vote")
 
-
 processVote :: Int -> Int -> UTCTime -> YesodDB App (Key Vote)
 processVote w l timestamp = do
     Just (Entity winnerId winner) <- getBy $ UniqueItem w
     Just (Entity loserId loser) <- getBy $ UniqueItem l
     let wr = itemRating winner
         lr = itemRating loser
-    update winnerId [ItemRating +=. adjustment 1.0 (expected wr lr)]
-    update loserId [ItemRating +=. adjustment 0.0 (expected lr wr)]
+    update winnerId [ItemRating +=. adjustment 1.0 (expected wr lr),
+                     ItemVotes +=. 1]
+    update loserId [ItemRating +=. adjustment 0.0 (expected lr wr),
+                    ItemVotes +=. 1]
     insert $ Vote winnerId loserId timestamp
     where adjustment s e = k * (s - e)
           expected r1 r2 = 1 / (1 + 10 ** ((r2 - r1) / 400))
