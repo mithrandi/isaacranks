@@ -1,0 +1,12 @@
+$newline never
+<div .jumbotron>
+  <h1>Support this site
+  <p>If you would like to support this site, there are a few ways you can do this below.
+
+<ul .list-group>
+  <li .list-group-item>
+    <script id="fbfrysd">(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=mithrandi&button=compact&url=http%3A%2F%2Fwww.isaacranks.com%2F';f.title='Flattr';f.height=20;f.width=110;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbfrysd');
+  <li .list-group-item>
+    Bitcoin: 1MrTPdKdAowGMsnVZRs25UhkpHPor28zfm
+  <li .list-group-item>
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top"><input type="hidden" name="cmd" value="_s-xclick"><input type="hidden" name="hosted_button_id" value="9JA3FKVCR2DWS"><input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"><img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
