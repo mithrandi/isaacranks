@@ -1,7 +1,7 @@
 /static StaticR Static getStatic
 /auth   AuthR   Auth   getAuth
 
-/favicon.ico FaviconR GET
+/favicon.ico MyFaviconR GET
 /robots.txt RobotsR GET
 
 / HomeR GET
