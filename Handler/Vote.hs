@@ -37,7 +37,7 @@ postVoteR = do
                      <*> ireq intField "loser"
   timestamp <- lift getCurrentTime
   _ <- runDB (processVote winner loser timestamp)
-  redirect VoteR
+  getVoteR
 
 getRanksR :: Handler Html
 getRanksR = do
