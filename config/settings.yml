@@ -15,5 +15,5 @@ Staging:
   <<: *defaults
 
 Production:
-  approot: "https://mighty-sands-3614.herokuapp.com"
+  approot: "http://www.isaacranks.com"
   <<: *defaults

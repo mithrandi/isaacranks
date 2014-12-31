@@ -15,6 +15,7 @@ Item json
     description Text
     rating Double
     votes Int
+    imageId Text default='000'
     UniqueItem isaacId
 
 Vote json

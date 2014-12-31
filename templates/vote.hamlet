@@ -4,32 +4,37 @@ $newline never
    <p>Please select the item you would prefer below:
 
 <div .row>
-    <div .col-md-4>
-      <div .panel .panel-default>
-        <div .panel-heading>
-          <h2 .panel-title>#{itemName left}
-        <p .panel-body>#{itemDescription left}
-        <div .panel-footer>
-          <form method="POST" action="">
-            <input type="hidden" name="winner" value="#{itemIsaacId left}">
-            <input type="hidden" name="loser" value="#{itemIsaacId right}">
-            <button .btn .btn-default type="submit">Choose
+  <div .col-md-4>
+    <div .panel .panel-primary .text-center>
+      <div .panel-heading>
+        <h2 .panel-title>#{itemName left}
+      <div .panel-body>
+        <div .center-block .rebirth-item class="r-itm#{itemImageId left}">
+        <p>#{itemDescription left}
+      <div .panel-footer>
+        <form method="POST" action="">
+          <input type="hidden" name="winner" value="#{itemIsaacId left}">
+          <input type="hidden" name="loser" value="#{itemIsaacId right}">
+          <button .btn .btn-default type="submit">Choose
 
-    <div .col-md-4>
-      <div .panel .panel-default>
-        <div .panel-heading>
-          <h2 .panel-title>?
-        <p .panel-body>I don't know / can't decide
-        <div .panel-footer>
-          <a .btn .btn-default href="@{VoteR}">Another
+  <div .col-md-4>
+    <div .panel .panel-info .text-center>
+      <div .panel-heading>
+        <h2 .panel-title>?
+      <div .panel-body>
+        <p>I don't know / can't decide
+      <div .panel-footer>
+        <a .btn .btn-default href="@{VoteR}">Another
 
-    <div .col-md-4>
-      <div .panel .panel-default>
-        <div .panel-heading>
-          <h2 .panel-title>#{itemName right}
-        <p .panel-body>#{itemDescription right}
-        <div .panel-footer>
-          <form method="POST" action="">
-            <input type="hidden" name="winner" value="#{itemIsaacId right}">
-            <input type="hidden" name="loser" value="#{itemIsaacId left}">
-            <button .btn .btn-default type="submit">Choose
+  <div .col-md-4>
+    <div .panel .panel-primary .text-center>
+      <div .panel-heading>
+        <h2 .panel-title>#{itemName right}
+      <div .panel-body>
+        <div .center-block .rebirth-item class="r-itm#{itemImageId right}">
+        <p>#{itemDescription right}
+      <div .panel-footer>
+        <form method="POST" action="">
+          <input type="hidden" name="winner" value="#{itemIsaacId right}">
+          <input type="hidden" name="loser" value="#{itemIsaacId left}">
+          <button .btn .btn-default type="submit">Choose

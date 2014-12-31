@@ -56,9 +56,10 @@ instance Yesod App where
 
     -- Store session data on the client in encrypted cookies,
     -- default session idle timeout is 120 minutes
-    makeSessionBackend _ = fmap Just $ defaultClientSessionBackend
-        120    -- timeout in minutes
-        "config/client_session_key.aes"
+    --makeSessionBackend _ = fmap Just $ defaultClientSessionBackend
+    --    120    -- timeout in minutes
+    --    "config/client_session_key.aes"
+    makeSessionBackend _ = return Nothing
 
     defaultLayout widget = do
         master <- getYesod
@@ -71,10 +72,11 @@ instance Yesod App where
         -- you to use normal widget features in default-layout.
 
         pc <- widgetToPageContent $ do
-            addStylesheetRemote "//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"
-            addStylesheetRemote "//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css"
-            addScriptRemote "//code.jquery.com/jquery-1.11.2.min.js"
-            addScriptRemote "//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"
+            addStylesheetRemote "http://static.isaacranks.com.s3.amazonaws.com/styles/bootstrap"
+            addStylesheetRemote "http://static.isaacranks.com.s3.amazonaws.com/styles/bootstrap-theme"
+            addStylesheetRemote "http://static.isaacranks.com.s3.amazonaws.com/styles/icons"
+            addScriptRemote "http://static.isaacranks.com.s3.amazonaws.com/scripts/jquery-1.11.2"
+            addScriptRemote "http://static.isaacranks.com.s3.amazonaws.com/scripts/bootstrap"
             $(widgetFile "default-layout")
         withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
