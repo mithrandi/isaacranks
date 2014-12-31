@@ -1,11 +1,21 @@
 module Handler.Vote where
 
-import Data.List (genericLength)
-import Data.Time (getCurrentTime, UTCTime)
-import Import
-import System.Random (newStdGen)
-import System.Random.Shuffle (shuffle')
-import Numeric (showFFloat)
+import           Data.Binary.Get (runGet, getWord32be)
+import           Data.Binary.Put (runPut, putWord32be)
+import qualified Data.ByteString as B
+import qualified Data.ByteString.Base64 as B64
+import qualified Data.ByteString.Char8 as BC
+import           Data.ByteString.Lazy (toStrict, fromStrict)
+import           Data.List (genericLength)
+import qualified Data.Text as T
+import           Data.Time (getCurrentTime)
+import           Import
+import           Numeric (showFFloat)
+import           System.Environment (getEnv)
+import           System.Random (newStdGen)
+import           System.Random.Shuffle (shuffle')
+import           Vote (processVote)
+import qualified Web.ClientSession as WS
 
 getVoteR :: Handler Html
 getVoteR = do
@@ -13,30 +23,46 @@ getVoteR = do
   gen <- lift newStdGen
   let (Entity _ left):(Entity _ right):_ = shuffle' items (length items) gen
   alreadyExpired
+  ballotLeft <- lift $ encryptBallot (itemIsaacId left) (itemIsaacId right)
+  ballotRight <- lift $ encryptBallot (itemIsaacId right) (itemIsaacId left)
   defaultLayout $ do
     setTitle "Isaac item ranks"
     $(widgetFile "vote")
 
-processVote :: Int -> Int -> UTCTime -> YesodDB App (Key Vote)
-processVote w l timestamp = do
-    Just (Entity winnerId winner) <- getBy $ UniqueItem w
-    Just (Entity loserId loser) <- getBy $ UniqueItem l
-    let wr = itemRating winner
-        lr = itemRating loser
-    update winnerId [ItemRating +=. adjustment 1.0 (expected wr lr),
-                     ItemVotes +=. 1]
-    update loserId [ItemRating +=. adjustment 0.0 (expected lr wr),
-                    ItemVotes +=. 1]
-    insert $ Vote winnerId loserId timestamp
-    where adjustment s e = k * (s - e)
-          expected r1 r2 = 1 / (1 + 10 ** ((r2 - r1) / 400))
-          k = 24.0
+encodeBallot :: Int -> Int -> B.ByteString
+encodeBallot winner loser = toStrict . runPut $ do
+  putWord32be (fromIntegral winner)
+  putWord32be (fromIntegral loser)
+
+decodeBallot :: B.ByteString -> (Int, Int)
+decodeBallot = go . fromStrict
+  where go = runGet $ do
+          winner <- getWord32be
+          loser <- getWord32be
+          return (fromIntegral winner, fromIntegral loser)
+
+maskingKey :: IO WS.Key
+maskingKey = do
+  Right key64 <- (B64.decode . BC.pack <$> getEnv "BALLOT_MASKING_KEY")
+  let Right key = WS.initKey key64
+  return key
+
+encryptBallot :: Int -> Int -> IO Text
+encryptBallot winner loser = do
+  k <- maskingKey
+  out <- WS.encryptIO k (encodeBallot winner loser)
+  return . T.pack . BC.unpack $ out
+
+decryptBallot :: Text -> IO (Int, Int)
+decryptBallot b = do
+  k <- maskingKey
+  let Just b' = WS.decrypt k (BC.pack . T.unpack $ b)
+  return $ decodeBallot b'
 
 postVoteR :: Handler Html
 postVoteR = do
-  (winner, loser) <- runInputPost $ (,)
-                     <$> ireq intField "winner"
-                     <*> ireq intField "loser"
+  ballot <- runInputPost $ ireq textField "ballot"
+  (winner, loser) <- lift $ decryptBallot ballot
   timestamp <- lift getCurrentTime
   _ <- runDB (processVote winner loser timestamp)
   getVoteR

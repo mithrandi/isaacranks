@@ -19,7 +19,6 @@ import           Network.Wai.Middleware.RequestLogger
     )
 import qualified Network.Wai.Middleware.RequestLogger as RequestLogger
 import           System.Log.FastLogger (newStdoutLoggerSet, defaultBufSize)
-import           Yesod.Auth
 import           Yesod.Core.Types (loggerSet, Logger (Logger))
 import           Yesod.Default.Config
 import           Yesod.Default.Handlers

@@ -23,6 +23,7 @@ library
                      Handler.Home
                      Handler.Vote
                      Handler.Donate
+                     Vote
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -78,6 +79,10 @@ library
                  , random
                  , random-shuffle
                  , heroku
+                 , base64-bytestring
+                 , binary
+                 , clientsession
+                 , transformers
 
     -- see https://github.com/yesodweb/yesod/issues/814
     if !os(windows)
@@ -92,6 +97,20 @@ executable         isaacranks
     build-depends:     base
                      , isaacranks
                      , yesod
+
+    ghc-options:       -threaded -O2 -rtsopts -with-rtsopts=-N
+
+executable rebuildranks
+    if flag(library-only)
+        Buildable: False
+
+    main-is:           rebuild.hs
+    hs-source-dirs:    app
+    build-depends:     base
+                     , isaacranks
+                     , yesod
+                     , persistent
+                     , monad-logger
 
     ghc-options:       -threaded -O2 -rtsopts -with-rtsopts=-N
 
