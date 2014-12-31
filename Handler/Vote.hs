@@ -46,7 +46,7 @@ getRanksR = do
   let ranks :: [Integer]
       ranks = [1..]
   items <- (ranks `zip`) <$> runDB (selectList [] [Desc ItemRating])
-  let totalVotes = sum . map (itemVotes . entityVal . snd) $ items
+  let totalVotes = (`div` 2) . sum . map (itemVotes . entityVal . snd) $ items
       meanVotes :: Double
       meanVotes = fromIntegral totalVotes / genericLength items
       meanVotesS = showFFloat (Just 2) meanVotes ""
