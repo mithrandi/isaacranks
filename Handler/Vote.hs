@@ -45,11 +45,11 @@ getRanksR :: Handler Html
 getRanksR = do
   let ranks :: [Integer]
       ranks = [1..]
+      showF x = showFFloat (Just 2) x ""
   items <- (ranks `zip`) <$> runDB (selectList [] [Desc ItemRating])
   let totalVotes = (`div` 2) . sum . map (itemVotes . entityVal . snd) $ items
       meanVotes :: Double
       meanVotes = fromIntegral totalVotes / genericLength items
-      meanVotesS = showFFloat (Just 2) meanVotes ""
   defaultLayout $ do
     setTitle "Isaac item ranks"
     $(widgetFile "ranks")

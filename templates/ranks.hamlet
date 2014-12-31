@@ -1,7 +1,7 @@
 $newline never
 <div .jumbotron>
   <h1>Item ranks
-  <p>#{totalVotes} votes total, mean of #{meanVotesS} per item.
+  <p>#{totalVotes} votes total, mean of #{showF meanVotes} per item.
 
 <table .table .table-responsive .table-hover>
   <tr>
@@ -17,5 +17,5 @@ $newline never
       <td>#{itemIsaacId item}
       <td>#{itemName item}
       <td>#{itemDescription item}
-      <td>#{itemRating item}
+      <td>#{showF (itemRating item)}
       <td>#{itemVotes item}
