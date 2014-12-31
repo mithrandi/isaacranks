@@ -12,7 +12,7 @@ $newline never
         <div .center-block .rebirth-item class="r-itm#{itemImageId left}">
         <p>#{itemDescription left}
       <div .panel-footer>
-        <form method="POST" action="">
+        <form method="POST" action=@{VoteR}>
           <input type="hidden" name="winner" value="#{itemIsaacId left}">
           <input type="hidden" name="loser" value="#{itemIsaacId right}">
           <button .btn .btn-default type="submit">Choose
@@ -24,7 +24,7 @@ $newline never
       <div .panel-body>
         <p>I don't know / can't decide
       <div .panel-footer>
-        <a .btn .btn-default href="@{VoteR}">Another
+        <a .btn .btn-default href=@{VoteR}>Reroll!
 
   <div .col-md-4>
     <div .panel .panel-primary .text-center>
@@ -34,7 +34,7 @@ $newline never
         <div .center-block .rebirth-item class="r-itm#{itemImageId right}">
         <p>#{itemDescription right}
       <div .panel-footer>
-        <form method="POST" action="">
+        <form method="POST" action=@{VoteR}>
           <input type="hidden" name="winner" value="#{itemIsaacId right}">
           <input type="hidden" name="loser" value="#{itemIsaacId left}">
           <button .btn .btn-default type="submit">Choose
