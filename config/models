@@ -13,9 +13,9 @@ Item json
     isaacId Int
     name Text
     description Text
+    imageId Text default='000'
     rating Double
     votes Int
-    imageId Text default='000'
     UniqueItem isaacId
 
 Vote json
