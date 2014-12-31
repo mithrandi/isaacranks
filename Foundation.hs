@@ -86,11 +86,7 @@ instance Yesod App where
         Just $ uncurry (joinPath y (Settings.staticRoot $ settings y)) $ renderRoute s
     urlRenderOverride _ _ = Nothing
 
-    -- The page to be redirected to when authentication is required.
-    authRoute _ = Just $ AuthR LoginR
-
     -- Routes not requiring authentication.
-    isAuthorized (AuthR _) _ = return Authorized
     isAuthorized MyFaviconR _ = return Authorized
     isAuthorized RobotsR _ = return Authorized
     -- Default to Authorized for now.
