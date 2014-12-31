@@ -1,6 +1,7 @@
 $newline never
 <div .jumbotron>
   <h1>Item ranks
+  <p>#{totalVotes} votes total, mean of #{meanVotesS} per item.
 
 <table .table .table-responsive .table-hover>
   <tr>
@@ -9,6 +10,7 @@ $newline never
     <th>Name
     <th>Description
     <th>Rating
+    <th>Votes
   $forall (rank, Entity _ item) <- items
     <tr>
       <td>#{rank}
@@ -16,3 +18,4 @@ $newline never
       <td>#{itemName item}
       <td>#{itemDescription item}
       <td>#{itemRating item}
+      <td>#{itemVotes item}

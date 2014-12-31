@@ -1,9 +1,11 @@
 module Handler.Vote where
 
+import Data.List (genericLength)
 import Data.Time (getCurrentTime, UTCTime)
 import Import
 import System.Random (newStdGen)
 import System.Random.Shuffle (shuffle')
+import Numeric (showFFloat)
 
 getVoteR :: Handler Html
 getVoteR = do
@@ -44,6 +46,10 @@ getRanksR = do
   let ranks :: [Integer]
       ranks = [1..]
   items <- (ranks `zip`) <$> runDB (selectList [] [Desc ItemRating])
+  let totalVotes = sum . map (itemVotes . entityVal . snd) $ items
+      meanVotes :: Double
+      meanVotes = fromIntegral totalVotes / genericLength items
+      meanVotesS = showFFloat (Just 2) meanVotes ""
   defaultLayout $ do
     setTitle "Isaac item ranks"
     $(widgetFile "ranks")
