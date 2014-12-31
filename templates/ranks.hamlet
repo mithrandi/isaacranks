@@ -1,7 +1,9 @@
 $newline never
 <div .jumbotron>
   <h1>Item ranks
-  <p>#{totalVotes} votes total, mean of #{showF meanVotes} per item.
+  <p>#{votesCast} votes total, mean of #{showF meanVotes} per item.
+  <p>Mean rating is #{showF meanRating}.
+  <p>Normalized rating is normalized to range [0, 1000].
 
 <div .table-responsive>
   <table .table .table-hover>
@@ -11,6 +13,7 @@ $newline never
       <th>Name
       <th>Description
       <th>Rating
+      <th>Normalized
       <th>Votes
     $forall (rank, Entity _ item) <- items
       <tr>
@@ -19,4 +22,5 @@ $newline never
         <td>#{itemName item}
         <td>#{itemDescription item}
         <td>#{showF (itemRating item)}
+        <td>#{showF (normalizedRating item)}
         <td>#{itemVotes item}

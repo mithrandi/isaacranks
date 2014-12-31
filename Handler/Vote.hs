@@ -47,9 +47,18 @@ getRanksR = do
       ranks = [1..]
       showF x = showFFloat (Just 2) x ""
   items <- (ranks `zip`) <$> runDB (selectList [] [Desc ItemRating])
-  let totalVotes = (`div` 2) . sum . map (itemVotes . entityVal . snd) $ items
+  let items' = map (entityVal . snd) items
+      totalVotes = sum . map itemVotes $ items'
+      votesCast = totalVotes `div` 2
+      totalItems = genericLength items
       meanVotes :: Double
-      meanVotes = fromIntegral totalVotes / genericLength items
+      meanVotes = fromIntegral totalVotes / totalItems
+      meanRating :: Double
+      meanRating = (sum . map itemRating) items' / totalItems
+      minRating = minimum . map itemRating $ items'
+      maxRating = maximum . map itemRating $ items'
+      ratingRange = maxRating - minRating
+      normalizedRating item = (itemRating item - minRating) / ratingRange * 1000
   defaultLayout $ do
     setTitle "Isaac item ranks"
     $(widgetFile "ranks")
