@@ -10,6 +10,7 @@ getVoteR = do
   items <- runDB $ selectList [] []
   gen <- lift newStdGen
   let (Entity _ left):(Entity _ right):_ = shuffle' items (length items) gen
+  alreadyExpired
   defaultLayout $ do
     setTitle "Isaac item ranks"
     $(widgetFile "vote")
