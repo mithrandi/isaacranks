@@ -3,19 +3,20 @@ $newline never
   <h1>Item ranks
   <p>#{totalVotes} votes total, mean of #{showF meanVotes} per item.
 
-<table .table .table-responsive .table-hover>
-  <tr>
-    <th>##
-    <th>Item ID
-    <th>Name
-    <th>Description
-    <th>Rating
-    <th>Votes
-  $forall (rank, Entity _ item) <- items
+<div .table-responsive>
+  <table .table .table-hover>
     <tr>
-      <td>#{rank}
-      <td>#{itemIsaacId item}
-      <td>#{itemName item}
-      <td>#{itemDescription item}
-      <td>#{showF (itemRating item)}
-      <td>#{itemVotes item}
+      <th>##
+      <th>Item ID
+      <th>Name
+      <th>Description
+      <th>Rating
+      <th>Votes
+    $forall (rank, Entity _ item) <- items
+      <tr>
+        <td>#{rank}
+        <td>#{itemIsaacId item}
+        <td>#{itemName item}
+        <td>#{itemDescription item}
+        <td>#{showF (itemRating item)}
+        <td>#{itemVotes item}
