@@ -7,9 +7,11 @@ import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Char8 as BC
 import           Data.ByteString.Lazy (toStrict, fromStrict)
 import           Data.List (genericLength)
+import           Data.List (last)
 import qualified Data.Text as T
 import           Data.Time (getCurrentTime)
 import           Import
+import           Network.Wai (requestHeaders, remoteHost)
 import           Numeric (showFFloat)
 import           System.Environment (getEnv)
 import           System.Random (newStdGen)
@@ -61,10 +63,16 @@ decryptBallot b = do
 
 postVoteR :: Handler Html
 postVoteR = do
+  request <- waiRequest
+  let value = T.pack . BC.unpack <$> lookup "X-Forwarded-For" (requestHeaders request)
+      voter = maybe
+              (T.pack . show $ remoteHost request)
+              (T.stripStart . T.stripEnd . last . T.splitOn ",")
+              value
   ballot <- runInputPost $ ireq textField "ballot"
   (winner, loser) <- lift $ decryptBallot ballot
   timestamp <- lift getCurrentTime
-  _ <- runDB (processVote winner loser timestamp)
+  _ <- runDB (processVote winner loser timestamp voter ballot)
   getVoteR
 
 getRanksR :: Handler Html

@@ -22,3 +22,6 @@ Vote json
     winner ItemId
     loser ItemId
     timestamp UTCTime
+    voter Text default=''
+    rawBallot Text Maybe
+    UniqueBallot rawBallot !force
