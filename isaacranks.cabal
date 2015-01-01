@@ -84,6 +84,7 @@ library
                  , clientsession
                  , transformers
                  , wai
+                 , containers
 
     -- see https://github.com/yesodweb/yesod/issues/814
     if !os(windows)
