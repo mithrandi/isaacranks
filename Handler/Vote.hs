@@ -3,7 +3,6 @@ module Handler.Vote where
 import           Data.Binary.Get (runGet, getWord32be)
 import           Data.Binary.Put (runPut, putWord32be)
 import qualified Data.ByteString as B
-import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Char8 as BC
 import           Data.ByteString.Lazy (toStrict, fromStrict)
 import           Data.List (genericLength)
@@ -13,7 +12,7 @@ import           Data.Time (getCurrentTime)
 import           Import
 import           Network.Wai (requestHeaders, remoteHost)
 import           Numeric (showFFloat)
-import           System.Environment (getEnv)
+
 import           System.Random (newStdGen)
 import           System.Random.Shuffle (shuffle')
 import           Vote (processVote)
@@ -25,8 +24,8 @@ getVoteR = do
   gen <- lift newStdGen
   let (Entity _ left):(Entity _ right):_ = shuffle' items (length items) gen
   alreadyExpired
-  ballotLeft <- lift $ encryptBallot (itemIsaacId left) (itemIsaacId right)
-  ballotRight <- lift $ encryptBallot (itemIsaacId right) (itemIsaacId left)
+  ballotLeft <- encryptBallot (itemIsaacId left) (itemIsaacId right)
+  ballotRight <- encryptBallot (itemIsaacId right) (itemIsaacId left)
   defaultLayout $ do
     setTitle "Isaac item ranks"
     $(widgetFile "vote")
@@ -43,21 +42,15 @@ decodeBallot = go . fromStrict
           loser <- getWord32be
           return (fromIntegral winner, fromIntegral loser)
 
-maskingKey :: IO WS.Key
-maskingKey = do
-  Right key64 <- (B64.decode . BC.pack <$> getEnv "BALLOT_MASKING_KEY")
-  let Right key = WS.initKey key64
-  return key
-
-encryptBallot :: Int -> Int -> IO Text
+encryptBallot :: (MonadHandler m, HandlerSite m ~ App) => Int -> Int -> m Text
 encryptBallot winner loser = do
-  k <- maskingKey
-  out <- WS.encryptIO k (encodeBallot winner loser)
+  k <- ballotKey <$> getYesod
+  out <- liftIO $ WS.encryptIO k (encodeBallot winner loser)
   return . T.pack . BC.unpack $ out
 
-decryptBallot :: Text -> IO (Int, Int)
+decryptBallot :: (MonadHandler m, HandlerSite m ~ App) => Text -> m (Int, Int)
 decryptBallot b = do
-  k <- maskingKey
+  k <- ballotKey <$> getYesod
   let Just b' = WS.decrypt k (BC.pack . T.unpack $ b)
   return $ decodeBallot b'
 
@@ -70,7 +63,7 @@ postVoteR = do
               (T.stripStart . T.stripEnd . last . T.splitOn ",")
               value
   ballot <- runInputPost $ ireq textField "ballot"
-  (winner, loser) <- lift $ decryptBallot ballot
+  (winner, loser) <- decryptBallot ballot
   timestamp <- lift getCurrentTime
   _ <- runDB (processVote winner loser timestamp voter ballot)
   getVoteR

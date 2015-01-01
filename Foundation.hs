@@ -1,23 +1,24 @@
 module Foundation where
 
-import Prelude
-import Yesod
-import Yesod.Static
-import Yesod.Auth
-import Yesod.Auth.BrowserId
-import Yesod.Default.Config
-import Yesod.Default.Util (addStaticContentExternal)
-import Network.HTTP.Client.Conduit (Manager, HasHttpManager (getHttpManager))
-import qualified Settings
-import Settings.Development (development)
 import qualified Database.Persist
-import Database.Persist.Sql (SqlBackend)
-import Settings.StaticFiles
-import Settings (widgetFile, Extra (..))
-import Model
-import Text.Jasmine (minifym)
-import Text.Hamlet (hamletFile)
-import Yesod.Core.Types (Logger)
+import           Database.Persist.Sql (SqlBackend)
+import           Model
+import           Network.HTTP.Client.Conduit (Manager, HasHttpManager (getHttpManager))
+import           Prelude
+import qualified Settings
+import           Settings (widgetFile, Extra (..))
+import           Settings.Development (development)
+import           Settings.StaticFiles
+import           Text.Hamlet (hamletFile)
+import           Text.Jasmine (minifym)
+import qualified Web.ClientSession as WC
+import           Yesod
+import           Yesod.Auth
+import           Yesod.Auth.BrowserId
+import           Yesod.Core.Types (Logger)
+import           Yesod.Default.Config
+import           Yesod.Default.Util (addStaticContentExternal)
+import           Yesod.Static
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -30,6 +31,7 @@ data App = App
     , httpManager :: Manager
     , persistConfig :: Settings.PersistConf
     , appLogger :: Logger
+    , ballotKey :: WC.Key
     }
 
 instance HasHttpManager App where

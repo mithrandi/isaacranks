@@ -6,6 +6,8 @@ module Application
     ) where
 
 import           Control.Monad.Logger (runLoggingT)
+import qualified Data.ByteString.Base64 as B64
+import qualified Data.ByteString.Char8 as BC
 import           Data.Default (def)
 import qualified Database.Persist
 import           Database.Persist.Postgresql (createPostgresqlPool, pgConnStr, pgPoolSize)
@@ -18,11 +20,13 @@ import           Network.Wai.Middleware.RequestLogger
     ( mkRequestLogger, outputFormat, OutputFormat (..), IPAddrSource (..), destination
     )
 import qualified Network.Wai.Middleware.RequestLogger as RequestLogger
+import           System.Environment (getEnv)
 import           System.Log.FastLogger (newStdoutLoggerSet, defaultBufSize)
 import           Yesod.Core.Types (loggerSet, Logger (Logger))
 import           Yesod.Default.Config
 import           Yesod.Default.Handlers
 import           Yesod.Default.Main
+import qualified Web.ClientSession as WS
 
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
@@ -75,6 +79,11 @@ makeFoundation conf = do
     loggerSet' <- newStdoutLoggerSet defaultBufSize
     (getter, _) <- clockDateCacher
 
+    key <- do
+        Right key64 <- (B64.decode . BC.pack <$> getEnv "BALLOT_MASKING_KEY")
+        let Right key = WS.initKey key64
+        return key
+
     let logger = Yesod.Core.Types.Logger loggerSet' getter
         mkFoundation p = App
             { settings = conf
@@ -83,6 +92,7 @@ makeFoundation conf = do
             , httpManager = manager
             , persistConfig = dbconf
             , appLogger = logger
+            , ballotKey = key
             }
         tempFoundation = mkFoundation $ error "connPool forced in tempFoundation"
         logFunc = messageLoggerSource tempFoundation logger
