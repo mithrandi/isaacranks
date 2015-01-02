@@ -1,7 +1,7 @@
 Default: &defaults
   host: "*4" # any IPv4 host
   port: 3000
-  approot: "http://localhost:3000"
+  approot: "http://lorien:3000"
   copyright: "Website © 2014 Tristan Seligmann; I do not hold the copyright to any content from The Binding of Isaac: Rebirth."
   #analytics: UA-YOURCODE
 

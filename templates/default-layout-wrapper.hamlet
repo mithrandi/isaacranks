@@ -41,6 +41,8 @@ $newline never
                              <a href=@{RanksR}>Ranks
                          <li>
                              <a href=@{DonateR}>Donate
+                         <li>
+                             <a href=@{ChangesR}>News
         <div .container>
             <header>
             <div id="main" role="main">

@@ -6,7 +6,7 @@ $newline never
   <p>Normalized rating is normalized to range [0, 1000].
 
 <div .table-responsive>
-  <table .table .table-hover>
+  <table .table .table-condensed .table-hover>
     <tr>
       <th>##
       <th>Item ID

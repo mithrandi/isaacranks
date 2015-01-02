@@ -1,0 +1,12 @@
+$newline never
+<div .jumbotron>
+  <h1>News / Changelog
+  <p>See the latest changes to the site here.
+
+<ul .list-group>
+  <li .list-group-item>
+    <h2 .list-group-item-heading>2015-01-02
+    <ul>
+      <li>Made the ranks table narrower.
+      <li>Tweaked the voting page display for medium size displays (eg. tablets).
+      <li>Added this changelog.

@@ -16,3 +16,8 @@ getMyFaviconR = do
   setEtag . T.pack . base64md5 =<< lift (LB.readFile path)
   cacheSeconds (24 * 60 * 60)
   sendFile "image/x-icon" path
+
+getChangesR :: Handler Html
+getChangesR = defaultLayout $ do
+  setTitle "Changelog"
+  $(widgetFile "changes")

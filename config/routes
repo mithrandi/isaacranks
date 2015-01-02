@@ -7,3 +7,4 @@
 /vote VoteR GET POST
 /ranks RanksR GET
 /donate DonateR GET
+/changes ChangesR GET
