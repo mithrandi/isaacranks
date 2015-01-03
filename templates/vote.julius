@@ -1,0 +1,11 @@
+$(document).ready(function () {
+    Mousetrap.bind('left', function () {
+        $('#vote-left').submit();
+    });
+    Mousetrap.bind('up', function () {
+        $('#vote-reroll').submit();
+    });
+    Mousetrap.bind('right', function () {
+        $('#vote-right').submit();
+    });
+});

@@ -12,9 +12,9 @@ $newline never
         <div .center-block .rebirth-item class="r-itm#{itemImageId left}">
         <p>#{itemDescription left}
       <div .panel-footer>
-        <form method="POST" action=@{VoteR}>
-          <input type="hidden" name="ballot" value="#{ballotLeft}">
-          <button .btn .btn-default type="submit">Choose
+        <form method=POST #vote-left action=@{VoteR}>
+          <input type=hidden name=ballot value=#{ballotLeft}>
+          <button .btn .btn-default type=submit>Choose
 
   <div .col-md-4>
     <div .panel .panel-info .text-center>
@@ -23,7 +23,8 @@ $newline never
       <div .panel-body>
         <p>I don't know / can't decide
       <div .panel-footer>
-        <a .btn .btn-default href=@{VoteR}>Reroll!
+        <form method=GET #vote-reroll action=@{VoteR}>
+          <button .btn .btn-default type=submit>Reroll!
 
   <div .col-md-4>
     <div .panel .panel-primary .text-center>
@@ -33,6 +34,16 @@ $newline never
         <div .center-block .rebirth-item class="r-itm#{itemImageId right}">
         <p>#{itemDescription right}
       <div .panel-footer>
-        <form method="POST" action=@{VoteR}>
-          <input type="hidden" name="ballot" value="#{ballotRight}">
-          <button .btn .btn-default type="submit">Choose
+        <form method=POST #vote-right action=@{VoteR}>
+          <input type=hidden name=ballot value="#{ballotRight}">
+          <button .btn .btn-default type=submit>Choose
+
+  <div .col-md-12>
+    <h2>Keyboard bindings:
+    <dl .dl-horizontal>
+      <dt>Left
+      <dd>Vote for the item on the left.
+      <dt>Up
+      <dd>Reroll!
+      <dt>Right
+      <dd>Vote for the item on the right.

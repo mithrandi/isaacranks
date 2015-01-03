@@ -5,8 +5,14 @@ $newline never
 
 <ul .list-group>
   <li .list-group-item>
-    <h2 .list-group-item-heading>2015-01-02
-    <ul>
-      <li>Made the ranks table narrower.
-      <li>Tweaked the voting page display for medium size displays (eg. tablets).
-      <li>Added this changelog.
+    <dl .dl-horizontal>
+      <dt>2015-01-03
+      <dd>
+        <ul>
+          <li>Added keyboard shortcuts for voting.
+      <dt>2015-01-02
+      <dd>
+        <ul>
+          <li>Made the ranks table narrower.
+          <li>Tweaked the voting page display for medium size displays (eg. tablets).
+          <li>Added this changelog.
