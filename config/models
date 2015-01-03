@@ -14,6 +14,7 @@ Item json
     name Text
     description Text
     imageId Text default='000'
+    wiki Text default=''
     rating Double
     votes Int
     UniqueItem isaacId

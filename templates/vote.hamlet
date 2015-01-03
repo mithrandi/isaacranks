@@ -7,7 +7,8 @@ $newline never
   <div .col-md-4>
     <div .panel .panel-primary .text-center>
       <div .panel-heading>
-        <h2 .panel-title>#{itemName left}
+        <h2 .panel-title>
+          <a href=#{itemWiki left}>#{itemName left}
       <div .panel-body>
         <div .center-block .rebirth-item class="r-itm#{itemImageId left}">
         <p>#{itemDescription left}
@@ -29,7 +30,8 @@ $newline never
   <div .col-md-4>
     <div .panel .panel-primary .text-center>
       <div .panel-heading>
-        <h2 .panel-title>#{itemName right}
+        <h2 .panel-title>
+          <a href=#{itemWiki right}>#{itemName right}
       <div .panel-body>
         <div .center-block .rebirth-item class="r-itm#{itemImageId right}">
         <p>#{itemDescription right}
