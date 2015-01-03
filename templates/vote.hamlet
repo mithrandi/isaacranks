@@ -10,7 +10,7 @@ $newline never
         <h2 .panel-title>
           <a href=#{itemWiki left}>#{itemName left}
       <div .panel-body>
-        <div .center-block .rebirth-item class="r-itm#{itemImageId left}">
+        <a .center-block .rebirth-item class="r-itm#{itemImageId left}" href=#{itemWiki left}>
         <p>#{itemDescription left}
       <div .panel-footer>
         <form method=POST #vote-left action=@{VoteR}>
@@ -33,7 +33,7 @@ $newline never
         <h2 .panel-title>
           <a href=#{itemWiki right}>#{itemName right}
       <div .panel-body>
-        <div .center-block .rebirth-item class="r-itm#{itemImageId right}">
+        <a .center-block .rebirth-item class="r-itm#{itemImageId right}" href=#{itemWiki right}>
         <p>#{itemDescription right}
       <div .panel-footer>
         <form method=POST #vote-right action=@{VoteR}>
