@@ -9,16 +9,6 @@ import           Database.Persist.Sql (SqlBackend)
 import           Debug.Trace (traceShow)
 import           Import
 
-processVote' :: MonadIO m => Entity Item -> Entity Item -> UTCTime -> Text -> Maybe Text -> ReaderT SqlBackend m Vote
-processVote' (Entity winnerId winner) (Entity loserId loser) timestamp voter rawBallot = do
-    let wr = itemRating winner
-        lr = itemRating loser
-    update winnerId [ItemRating +=. adjustment 1.0 (expected wr lr),
-                     ItemVotes +=. 1]
-    update loserId [ItemRating +=. adjustment 0.0 (expected lr wr),
-                    ItemVotes +=. 1]
-    return $ Vote winnerId loserId timestamp voter rawBallot
-
 k :: Double
 k = 24.0
 
@@ -30,19 +20,9 @@ expected r1 r2 = 1 / (1 + 10 ** ((r2 - r1) / 400))
 
 processVote :: MonadIO m => Int -> Int -> UTCTime -> Text -> Text -> ReaderT SqlBackend m (Key Vote)
 processVote w l timestamp voter rawBallot = do
-  Just w' <- getBy $ UniqueItem w
-  Just l' <- getBy $ UniqueItem l
-  vote <- processVote' w' l' timestamp voter (Just rawBallot)
-  insert vote
-
-reprocessVote :: MonadIO m => Vote -> ReaderT SqlBackend m ()
-reprocessVote v = do
-  let winnerId = voteWinner v
-      loserId = voteLoser v
-  Just winner <- get winnerId
-  Just loser <- get loserId
-  _ <- processVote' (Entity winnerId winner) (Entity loserId loser) (voteTimestamp v) (voteVoter v) (voteRawBallot v)
-  return ()
+  Just (Entity w' _) <- getBy $ UniqueItem w
+  Just (Entity l' _) <- getBy $ UniqueItem l
+  insert $ Vote w' l' timestamp voter (Just rawBallot)
 
 applyVote :: M.Map (Key Item) Item -> Vote -> M.Map (Key Item) Item
 applyVote items vote =
