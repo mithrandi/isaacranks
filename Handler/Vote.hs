@@ -9,10 +9,10 @@ import           Data.List (genericLength)
 import           Data.List (last)
 import qualified Data.Text as T
 import           Data.Time (getCurrentTime)
+import           Database.Persist.Sql (rawSql)
 import           Import
 import           Network.Wai (requestHeaders, remoteHost)
 import           Numeric (showFFloat)
-
 import           System.Random (newStdGen)
 import           System.Random.Shuffle (shuffle')
 import           Vote (processVote)
@@ -73,13 +73,13 @@ getRanksR = do
   let ranks :: [Integer]
       ranks = [1..]
       showF x = showFFloat (Just 2) x ""
-  items <- (ranks `zip`) <$> runDB (selectList [] [Desc ItemRating])
+  (items, votesCast) <- runDB $ (,)
+    <$> ((ranks `zip`) <$> selectList [] [Desc ItemRating])
+    <*> count ([] :: [Filter Vote])
   let items' = map (entityVal . snd) items
-      totalVotes = sum . map itemVotes $ items'
-      votesCast = totalVotes `div` 2
       totalItems = genericLength items
       meanVotes :: Double
-      meanVotes = fromIntegral totalVotes / totalItems
+      meanVotes = fromIntegral (votesCast * 2) / totalItems
       meanRating :: Double
       meanRating = (sum . map itemRating) items' / totalItems
       minRating = minimum . map itemRating $ items'
