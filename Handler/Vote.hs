@@ -18,7 +18,7 @@ import           System.Random.Shuffle (shuffle')
 import           Vote (processVote)
 import qualified Web.ClientSession as WS
 
-getVoteR :: Handler Html
+getVoteR :: Handler TypedContent
 getVoteR = do
   items <- runDB $ selectList [] []
   gen <- lift newStdGen
@@ -26,9 +26,16 @@ getVoteR = do
   alreadyExpired
   ballotLeft <- encryptBallot (itemIsaacId left) (itemIsaacId right)
   ballotRight <- encryptBallot (itemIsaacId right) (itemIsaacId left)
-  defaultLayout $ do
-    setTitle "Isaac item ranks"
-    $(widgetFile "vote")
+  selectRep $ do
+    provideRep . defaultLayout $ do
+      setTitle "Isaac item ranks"
+      $(widgetFile "vote")
+    provideJson $ object
+      [ "left" .= left
+      , "ballotLeft" .= ballotLeft
+      , "right" .= right
+      , "ballotRight" .= ballotRight
+      ]
 
 encodeBallot :: Int -> Int -> B.ByteString
 encodeBallot winner loser = toStrict . runPut $ do
@@ -42,19 +49,19 @@ decodeBallot = go . fromStrict
           loser <- getWord32be
           return (fromIntegral winner, fromIntegral loser)
 
-encryptBallot :: (MonadHandler m, HandlerSite m ~ App) => Int -> Int -> m Text
+encryptBallot :: Int -> Int -> Handler Text
 encryptBallot winner loser = do
   k <- ballotKey <$> getYesod
   out <- liftIO $ WS.encryptIO k (encodeBallot winner loser)
   return . T.pack . BC.unpack $ out
 
-decryptBallot :: (MonadHandler m, HandlerSite m ~ App) => Text -> m (Int, Int)
+decryptBallot :: Text -> Handler (Int, Int)
 decryptBallot b = do
   k <- ballotKey <$> getYesod
   let Just b' = WS.decrypt k (BC.pack . T.unpack $ b)
   return $ decodeBallot b'
 
-postVoteR :: Handler Html
+postVoteR :: Handler TypedContent
 postVoteR = do
   request <- waiRequest
   let value = T.pack . BC.unpack <$> lookup "X-Forwarded-For" (requestHeaders request)
