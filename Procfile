@@ -1,1 +1,1 @@
-web: /app/bin/isaacranks production -p $PORT
+web: /app/bin/isaacranks $YESOD_ENVIRONMENT -p $PORT
