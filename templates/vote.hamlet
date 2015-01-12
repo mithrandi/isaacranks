@@ -3,43 +3,45 @@ $newline never
    <h1>Rank items
    <p>Please select the item you would prefer below:
 
-<div .row>
-  <div .col-md-4>
-    <div .panel .panel-primary .text-center>
-      <div .panel-heading>
-        <h2 .panel-title>
-          <a href=#{itemWiki left}>#{itemName left}
-      <div .panel-body>
-        <a .center-block .rebirth-item class="r-itm#{itemImageId left}" href=#{itemWiki left}>
-        <p>#{itemDescription left}
-      <div .panel-footer>
-        <form method=POST #vote-left action=@{VoteR}>
-          <input type=hidden name=ballot value=#{ballotLeft}>
-          <button .btn .btn-default type=submit>Choose
+<div #booth data-ballot=#{jsonToText ballotJson}>
+  <div.row>
+    <div .col-md-4>
+      <div .panel .panel-primary .text-center>
+        <div .panel-heading>
+          <h2 .panel-title>
+            <a href=#{itemWiki left}>#{itemName left}
+        <div .panel-body>
+          <a .center-block .rebirth-item class="r-itm#{itemImageId left}" href=#{itemWiki left}>
+          <p>#{itemDescription left}
+        <div .panel-footer>
+          <form method=POST action=@{VoteR}>
+            <input type=hidden name=ballot value=#{ballotLeft}>
+            <button .btn .btn-default type=submit>Choose
 
-  <div .col-md-4>
-    <div .panel .panel-info .text-center>
-      <div .panel-heading>
-        <h2 .panel-title>?
-      <div .panel-body>
-        <p>I don't know / can't decide
-      <div .panel-footer>
-        <form method=GET #vote-reroll action=@{VoteR}>
+    <div .col-md-4>
+      <div .panel .panel-info .text-center>
+        <div .panel-heading>
+          <h2 .panel-title>?
+        <div .panel-body>
+          <p>I don't know / can't decide
+        <div .panel-footer>
+          <form method=GET action=@{VoteR}>
           <button .btn .btn-default type=submit>Reroll!
 
-  <div .col-md-4>
-    <div .panel .panel-primary .text-center>
-      <div .panel-heading>
-        <h2 .panel-title>
-          <a href=#{itemWiki right}>#{itemName right}
-      <div .panel-body>
-        <a .center-block .rebirth-item class="r-itm#{itemImageId right}" href=#{itemWiki right}>
-        <p>#{itemDescription right}
-      <div .panel-footer>
-        <form method=POST #vote-right action=@{VoteR}>
-          <input type=hidden name=ballot value="#{ballotRight}">
-          <button .btn .btn-default type=submit>Choose
+    <div .col-md-4>
+      <div .panel .panel-primary .text-center>
+        <div .panel-heading>
+          <h2 .panel-title>
+            <a href=#{itemWiki right}>#{itemName right}
+        <div .panel-body>
+          <a .center-block .rebirth-item class="r-itm#{itemImageId right}" href=#{itemWiki right}>
+          <p>#{itemDescription right}
+        <div .panel-footer>
+          <form method=POST action=@{VoteR}>
+            <input type=hidden name=ballot value="#{ballotRight}">
+            <button .btn .btn-default type=submit>Choose
 
+<div .row>
   <div .col-md-12>
     <h2>Keyboard bindings:
     <dl .dl-horizontal>

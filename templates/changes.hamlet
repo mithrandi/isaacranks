@@ -6,6 +6,11 @@ $newline never
 <ul .list-group>
   <li .list-group-item>
     <dl .dl-horizontal>
+      <dt>2015-01-12
+      <dd>
+        <ul>
+          <li>Implemented asynchronous voting; voting should now feel much faster, especially on higher-latency connections.
+          <li>Prevent accidentally voting multiple times in a row caused by holding down one of the key bindings.
       <dt>2015-01-03
       <dd>
         <ul>

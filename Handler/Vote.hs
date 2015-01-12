@@ -1,5 +1,6 @@
 module Handler.Vote where
 
+import           Data.Aeson (encode)
 import           Data.Binary.Get (runGet, getWord32be)
 import           Data.Binary.Put (runPut, putWord32be)
 import qualified Data.ByteString as B
@@ -8,8 +9,8 @@ import           Data.ByteString.Lazy (toStrict, fromStrict)
 import           Data.List (genericLength)
 import           Data.List (last)
 import qualified Data.Text as T
+import           Data.Text.Encoding (decodeUtf8)
 import           Data.Time (getCurrentTime)
-import           Database.Persist.Sql (rawSql)
 import           Import
 import           Network.Wai (requestHeaders, remoteHost)
 import           Numeric (showFFloat)
@@ -17,6 +18,9 @@ import           System.Random (newStdGen)
 import           System.Random.Shuffle (shuffle')
 import           Vote (processVote)
 import qualified Web.ClientSession as WS
+
+jsonToText :: ToJSON a => a -> Text
+jsonToText = decodeUtf8 . toStrict . encode
 
 getVoteR :: Handler TypedContent
 getVoteR = do
@@ -26,16 +30,21 @@ getVoteR = do
   alreadyExpired
   ballotLeft <- encryptBallot (itemIsaacId left) (itemIsaacId right)
   ballotRight <- encryptBallot (itemIsaacId right) (itemIsaacId left)
+  let ballotJson = object
+                   [ "left" .= left
+                   , "ballotLeft" .= ballotLeft
+                   , "right" .= right
+                   , "ballotRight" .= ballotRight
+                   ]
   selectRep $ do
     provideRep . defaultLayout $ do
+      addScriptRemote "http://static.isaacranks.com/scripts/es5-shim-4.0.5"
+      addScriptRemote "http://static.isaacranks.com/scripts/es5-sham-4.0.5"
+      addScriptRemote "http://static.isaacranks.com/scripts/react-with-addons-0.12.2"
+      addStylesheetRemote "http://static.isaacranks.com/styles/font-awesome-4.2.0"
       setTitle "Isaac item ranks"
       $(widgetFile "vote")
-    provideJson $ object
-      [ "left" .= left
-      , "ballotLeft" .= ballotLeft
-      , "right" .= right
-      , "ballotRight" .= ballotRight
-      ]
+    provideJson ballotJson
 
 encodeBallot :: Int -> Int -> B.ByteString
 encodeBallot winner loser = toStrict . runPut $ do

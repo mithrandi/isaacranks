@@ -1,11 +1,250 @@
+var MousetrapMixin = {
+    bindings: [],
+
+    bind: function (key, handler, evt) {
+        Mousetrap.bind(key, handler, evt);
+    },
+
+    unbind: function (key) {
+        var index = this.mousetrapBindings.indexOf(key);
+        if (index > -1) {
+            this.mousetrapBindings.splice(index, 1);
+        }
+        Mousetrap.unbind(key);
+    },
+
+    unbindAll: function () {
+        this.bindings.forEach(function (key) {
+            Mousetrap.unbind(key);
+        });
+    },
+
+    componentWillUnmount: function () {
+        this.unbindAll();
+    }
+};
+
+
+var BallotStore = function () {
+    this._ballots = [];
+    this.empty = {loading: true,
+                  left: {isaacId: -1},
+                  ballotLeft: '',
+                  right: {isaacId: -2},
+                  ballotRight: ''};
+};
+
+BallotStore.prototype.top = function () {
+    return this._ballots[0] || this.empty;
+};
+
+BallotStore.prototype.castBallot = function () {
+    this._ballots.shift();
+    if (this.observer) {
+        this.observer.setState({ballot: this.top()});
+    }
+};
+
+BallotStore.prototype.newBallot = function (ballot) {
+    this._ballots.push(ballot);
+    if (this.observer && this._ballots.length == 1) {
+        this.observer.setState({ballot: this.top()});
+    }
+};
+
+BallotStore.prototype.vote = function (ballot) {
+    this.castBallot();
+    $.post(document.location, {'ballot': ballot}, null, 'json').then(
+        function (newBallot) { ballotStore.newBallot(newBallot); });
+};
+
+BallotStore.prototype.reroll = function () {
+    this.castBallot();
+    $.getJSON(document.location).then(
+        function (newBallot) { ballotStore.newBallot(newBallot); });
+};
+
+
+var VotingPanel = React.createFactory(React.createClass({
+    propTypes: {loading: React.PropTypes.bool,
+                item: React.PropTypes.object.isRequired,
+                ballot: React.PropTypes.string.isRequired},
+
+    getDefaultProps: function () {
+        return {loading: false};
+    },
+
+    vote: function (event) {
+        event.preventDefault();
+        if (this.props.loading)
+            return;
+        ballotStore.vote(this.props.ballot);
+    },
+
+    render: function () {
+        var div = React.DOM.div,
+            h2 = React.DOM.h2,
+            a = React.DOM.a,
+            p = React.DOM.p,
+            form = React.DOM.form,
+            input = React.DOM.input,
+            button = React.DOM.button,
+            i = React.DOM.i;
+        var loading = this.props.loading,
+            item = this.props.item,
+            ballot = this.props.ballot;
+        var throb = function (e) {
+            return loading ? i({className: 'fa fa-refresh fa-spin'}, null) : e;
+        };
+        var empty = function (e) {
+            return loading ? null : e;
+        };
+        return div({className: 'panel panel-primary text-center'},
+                   div({className: 'panel-heading'},
+                       empty(
+                           h2({className: 'panel-title'},
+                              a({href: item.wiki}, item.name)))),
+                   div({className: 'panel-body'},
+                       throb(
+                           a({className: 'center-block rebirth-item r-itm' + item.imageId,
+                              href: item.wiki})),
+                       empty(p(null, item.description))),
+                   div({className: 'panel-footer'},
+                       empty(
+                           form({method: 'POST', action: document.location, onSubmit: this.vote},
+                                input({type: 'hidden', name: 'ballot', value: ballot}),
+                                button({className: 'btn btn-default',
+                                        type: 'submit'},
+                                       'Choose')))));
+    }
+}));
+
+var VotingBooth = React.createFactory(React.createClass({
+    mixins: [MousetrapMixin],
+
+    getInitialState: function () {
+        return {ballot: ballotStore.top()};
+    },
+
+    componentDidMount: function () {
+        this.bind('left', this.voteLeft, 'keydown');
+        this.bind('left', this.resetLeft, 'keyup');
+        this.bind('up', this.reroll, 'keydown');
+        this.bind('up', this.resetUp, 'keyup');
+        this.bind('right', this.voteRight, 'keydown');
+        this.bind('right', this.resetRight, 'keyup');
+        ballotStore.observer = this;
+    },
+
+    componentWillUnmount: function () {
+        if (ballotStore.observer === this) {
+            ballotStore.observer = undefined;
+        }
+    },
+
+    resetLeft: function (event) {
+        event.preventDefault();
+        this.leftDisabled = false;
+    },
+
+    resetUp: function (event) {
+        event.preventDefault();
+        this.upDisabled = false;
+    },
+
+    resetRight: function (event) {
+        event.preventDefault();
+        this.rightDisabled = false;
+    },
+
+    reroll: function (event) {
+        event.preventDefault();
+        if (this.upDisabled)
+            return;
+        this.upDisabled = true;
+
+        if (this.state.ballot.loading)
+            return;
+        ballotStore.reroll();
+    },
+
+    voteLeft: function (event) {
+        event.preventDefault();
+        if (this.leftDisabled)
+            return;
+        this.leftDisabled = true;
+        return this.vote(this.state.ballot.ballotLeft, event);
+    },
+
+    voteRight: function (event) {
+        event.preventDefault();
+        if (this.rightDisabled)
+            return;
+        this.rightDisabled = true;
+        return this.vote(this.state.ballot.ballotRight, event);
+    },
+
+    vote: function (ballot, event) {
+        if (this.state.ballot.loading)
+            return;
+        ballotStore.vote(ballot);
+    },
+
+    render: function () {
+        var div = React.DOM.div,
+            h2 = React.DOM.h2,
+            a = React.DOM.a,
+            p = React.DOM.p,
+            form = React.DOM.form,
+            button = React.DOM.button;
+        var ballot = this.state.ballot;
+        var empty = function (e) {
+            return ballot.loading ? null : e;
+        };
+        var ReactCSSTransitionGroup = React.createFactory(React.addons.CSSTransitionGroup);
+        return (
+            div({className: 'row'},
+                ReactCSSTransitionGroup(
+                    {transitionName: 'voting',
+                     transitionLeave: false,
+                     component: 'div',
+                     className: 'col-md-4'},
+                    VotingPanel({key: ballot.left.isaacId,
+                                 loading: ballot.loading,
+                                 item: ballot.left,
+                                 ballot: ballot.ballotLeft})),
+                div({className: 'col-md-4'}, empty(
+                    div({className: 'panel panel-info text-center'},
+                        div({className: 'panel-heading'},
+                            h2({className: 'panel-title'}, '?')),
+                        div({className: 'panel-body'},
+                            p(null, "I don't know / can't decide")),
+                        div({className: 'panel-footer'},
+                            form({method: 'GET', action: document.location, onSubmit: this.reroll},
+                                 button({className: 'btn btn-default',
+                                         type: 'submit'},
+                                        'Reroll!')))))),
+                ReactCSSTransitionGroup(
+                    {transitionName: 'voting',
+                     transitionLeave: false,
+                     component: 'div',
+                     className: 'col-md-4'},
+                    VotingPanel({key: ballot.right.isaacId,
+                                 loading: ballot.loading,
+                                 item: ballot.right,
+                                 ballot: ballot.ballotRight}))));
+    }
+}));
+
+
 $(document).ready(function () {
-    Mousetrap.bind('left', function () {
-        $('#vote-left').submit();
-    });
-    Mousetrap.bind('up', function () {
-        $('#vote-reroll').submit();
-    });
-    Mousetrap.bind('right', function () {
-        $('#vote-right').submit();
-    });
+    window.ballotStore = new BallotStore();
+    ballotStore.newBallot($('#booth').data('ballot'));
+    setTimeout(function () {
+        $.getJSON(document.location).then(
+            function (ballot) { ballotStore.newBallot(ballot); });
+    }, 1);
+    React.render(
+        VotingBooth(),
+        document.getElementById('booth'));
 });

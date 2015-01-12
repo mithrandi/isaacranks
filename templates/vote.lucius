@@ -1,0 +1,8 @@
+.voting-enter {
+    opacity: 0;
+    transition: opacity .15s linear;
+}
+
+.voting-enter.voting-enter-active {
+    opacity: 1;
+}
