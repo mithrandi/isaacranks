@@ -1,22 +1,46 @@
 var MousetrapMixin = {
-    bindings: [],
-
     bind: function (key, handler, evt) {
         Mousetrap.bind(key, handler, evt);
+        this._mousetrapBindings.push(key);
+    },
+
+    bindPressOnce: function (key, handler) {
+        var pressed = false;
+        this.bind(
+            key,
+            function (e) {
+                e.preventDefault();
+                if (!pressed) {
+                    pressed = true;
+                    handler(e);
+                }
+            },
+            'keydown');
+        this.bind(
+            key,
+            function (e) {
+                e.preventDefault();
+                pressed = false;
+            },
+            'keyup');
     },
 
     unbind: function (key) {
-        var index = this.mousetrapBindings.indexOf(key);
+        var index = this._mousetrapBindings.indexOf(key);
         if (index > -1) {
-            this.mousetrapBindings.splice(index, 1);
+            this._mousetrapBindings.splice(index, 1);
         }
         Mousetrap.unbind(key);
     },
 
     unbindAll: function () {
-        this.bindings.forEach(function (key) {
+        this._mousetrapBindings.forEach(function (key) {
             Mousetrap.unbind(key);
         });
+    },
+
+    componentWillMount: function () {
+        this._mousetrapBindings = [];
     },
 
     componentWillUnmount: function () {
@@ -27,41 +51,65 @@ var MousetrapMixin = {
 
 var BallotStore = function () {
     this._ballots = [];
-    this.empty = {loading: true,
-                  left: {isaacId: -1},
-                  ballotLeft: '',
-                  right: {isaacId: -2},
-                  ballotRight: ''};
+    this.key = 0;
+};
+
+BallotStore.prototype.empty = function () {
+    return {key: ++this.key,
+            loading: true,
+            left: {},
+            ballotLeft: '',
+            right: {},
+            ballotRight: ''};
 };
 
 BallotStore.prototype.top = function () {
-    return this._ballots[0] || this.empty;
+    return this._ballots[0] || this.empty();
 };
 
 BallotStore.prototype.castBallot = function () {
     this._ballots.shift();
-    if (this.observer) {
-        this.observer.setState({ballot: this.top()});
-    }
+    this.render();
 };
 
 BallotStore.prototype.newBallot = function (ballot) {
+    ballot.loading = false;
+    ballot.key = ++this.key;
     this._ballots.push(ballot);
-    if (this.observer && this._ballots.length == 1) {
-        this.observer.setState({ballot: this.top()});
-    }
+    this.render();
+};
+
+BallotStore.prototype.checkTimeout = function () {
+    if (this.timeout)
+        return false;
+    this.timeout = setTimeout(
+        (function () { this.timeout = undefined; }).bind(this),
+        300);
+    return true;
 };
 
 BallotStore.prototype.vote = function (ballot) {
+    if (!this.checkTimeout()) return;
     this.castBallot();
     $.post(document.location, {'ballot': ballot}, null, 'json').then(
-        function (newBallot) { ballotStore.newBallot(newBallot); });
+        this.newBallot.bind(this));
+};
+
+BallotStore.prototype.fetchBallot = function () {
+    $.getJSON(document.location).then(
+        this.newBallot.bind(this));
 };
 
 BallotStore.prototype.reroll = function () {
+    if (!this.checkTimeout()) return;
     this.castBallot();
-    $.getJSON(document.location).then(
-        function (newBallot) { ballotStore.newBallot(newBallot); });
+    this.fetchBallot();
+};
+
+BallotStore.prototype.render = function () {
+    React.render(
+        VotingBooth({ballot: this.top()}),
+        document.getElementById('booth'));
 };
 
 
@@ -69,10 +117,6 @@ var VotingPanel = React.createFactory(React.createClass({
     propTypes: {loading: React.PropTypes.bool,
                 item: React.PropTypes.object.isRequired,
                 ballot: React.PropTypes.string.isRequired},
-
-    getDefaultProps: function () {
-        return {loading: false};
-    },
 
     vote: function (event) {
         event.preventDefault();
@@ -122,70 +166,30 @@ var VotingPanel = React.createFactory(React.createClass({
 var VotingBooth = React.createFactory(React.createClass({
     mixins: [MousetrapMixin],
 
-    getInitialState: function () {
-        return {ballot: ballotStore.top()};
-    },
+    propTypes: {ballot: React.PropTypes.object.isRequired},
 
     componentDidMount: function () {
-        this.bind('left', this.voteLeft, 'keydown');
-        this.bind('left', this.resetLeft, 'keyup');
-        this.bind('up', this.reroll, 'keydown');
-        this.bind('up', this.resetUp, 'keyup');
-        this.bind('right', this.voteRight, 'keydown');
-        this.bind('right', this.resetRight, 'keyup');
-        ballotStore.observer = this;
-    },
-
-    componentWillUnmount: function () {
-        if (ballotStore.observer === this) {
-            ballotStore.observer = undefined;
-        }
-    },
-
-    resetLeft: function (event) {
-        event.preventDefault();
-        this.leftDisabled = false;
-    },
-
-    resetUp: function (event) {
-        event.preventDefault();
-        this.upDisabled = false;
-    },
-
-    resetRight: function (event) {
-        event.preventDefault();
-        this.rightDisabled = false;
+        this.bindPressOnce('left',  this.voteLeft);
+        this.bindPressOnce('up',    this.reroll);
+        this.bindPressOnce('right', this.voteRight);
     },
 
     reroll: function (event) {
-        event.preventDefault();
-        if (this.upDisabled)
-            return;
-        this.upDisabled = true;
-
-        if (this.state.ballot.loading)
+        if (this.props.ballot.loading)
             return;
         ballotStore.reroll();
     },
 
     voteLeft: function (event) {
-        event.preventDefault();
-        if (this.leftDisabled)
-            return;
-        this.leftDisabled = true;
-        return this.vote(this.state.ballot.ballotLeft, event);
+        return this.vote(this.props.ballot.ballotLeft, event);
     },
 
     voteRight: function (event) {
-        event.preventDefault();
-        if (this.rightDisabled)
-            return;
-        this.rightDisabled = true;
-        return this.vote(this.state.ballot.ballotRight, event);
+        return this.vote(this.props.ballot.ballotRight, event);
     },
 
     vote: function (ballot, event) {
-        if (this.state.ballot.loading)
+        if (this.props.ballot.loading)
             return;
         ballotStore.vote(ballot);
     },
@@ -197,7 +201,7 @@ var VotingBooth = React.createFactory(React.createClass({
             p = React.DOM.p,
             form = React.DOM.form,
             button = React.DOM.button;
-        var ballot = this.state.ballot;
+        var ballot = this.props.ballot;
         var empty = function (e) {
             return ballot.loading ? null : e;
         };
@@ -209,7 +213,7 @@ var VotingBooth = React.createFactory(React.createClass({
                      transitionLeave: false,
                      component: 'div',
                      className: 'col-md-4'},
-                    VotingPanel({key: ballot.left.isaacId,
+                    VotingPanel({key: ballot.key,
                                  loading: ballot.loading,
                                  item: ballot.left,
                                  ballot: ballot.ballotLeft})),
@@ -229,7 +233,7 @@ var VotingBooth = React.createFactory(React.createClass({
                      transitionLeave: false,
                      component: 'div',
                      className: 'col-md-4'},
-                    VotingPanel({key: ballot.right.isaacId,
+                    VotingPanel({key: ballot.key,
                                  loading: ballot.loading,
                                  item: ballot.right,
                                  ballot: ballot.ballotRight}))));
@@ -241,10 +245,6 @@ $(document).ready(function () {
     window.ballotStore = new BallotStore();
     ballotStore.newBallot($('#booth').data('ballot'));
     setTimeout(function () {
-        $.getJSON(document.location).then(
-            function (ballot) { ballotStore.newBallot(ballot); });
+        ballotStore.fetchBallot();
     }, 1);
-    React.render(
-        VotingBooth(),
-        document.getElementById('booth'));
 });
