@@ -79,7 +79,7 @@ instance Yesod App where
             addStylesheetRemote "http://static.isaacranks.com/styles/icons"
             addScriptRemote "http://static.isaacranks.com/scripts/jquery-1.11.2"
             addScriptRemote "http://static.isaacranks.com/scripts/bootstrap"
-            addScriptRemote "http://static.isaacranks.com/scripts/mousetrap-1.4.6"
+            addScriptRemote "http://static.isaacranks.com/scripts/mousetrap-1.5.3"
             $(widgetFile "default-layout")
         withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
