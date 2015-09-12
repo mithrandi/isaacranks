@@ -6,7 +6,7 @@ import {Provider, connect} from 'react-redux'
 
 class Item extends React.Component {
   render() {
-    const {index, item, norm} = this.props;
+    const {index, item, norm} = this.props
     return (
       <tr>
         <td>{index + 1}</td>
@@ -51,7 +51,7 @@ class RanksTable extends React.Component {
 class Ranks extends React.Component {
   render() {
     if (this.props.loading || this.props.error) {
-      const message = this.props.loading ? 'Loading...' : this.props.error;
+      const message = this.props.loading ? 'Loading...' : this.props.error
       return (
         <div className="jumbotron">
           <h1>Item ranks</h1>
@@ -59,7 +59,7 @@ class Ranks extends React.Component {
         </div>
       )
     }
-    const {items, votesCast, meanVotes, minRating, maxRating} = this.props.ranks;
+    const {items, votesCast, meanVotes, minRating, maxRating} = this.props.ranks
     return (
       <div>
         <div className="jumbotron">
@@ -96,14 +96,14 @@ Ranks.propTypes = (
 const RanksC = connect((state) => state)(Ranks)
 
 
-const LOAD_DATA = 'LOAD_DATA'
-function loadData(data) {
-  return { type: LOAD_DATA
+const LOAD_RANKS = 'LOAD_RANKS'
+function loadRanks(data) {
+  return { type: LOAD_RANKS
          , data: data
          }
 }
 
-const ERROR_FAIL = 'ERROR_FAIL';
+const ERROR_FAIL = 'ERROR_FAIL'
 function errorFail(e) {
   return { type: ERROR_FAIL
          , error: e
@@ -117,7 +117,7 @@ const initialState = (
 
 const store = createStore(function (state = initialState, action) {
   switch (action.type) {
-    case LOAD_DATA:
+    case LOAD_RANKS:
       return Object.assign(
         {}, state,
         { ranks: action.data
@@ -150,7 +150,7 @@ fetch(
     }
     return response.json()
   }).then(function (data) {
-    store.dispatch(loadData(data))
+    store.dispatch(loadRanks(data))
   }).catch(function (e) {
     store.dispatch(errorFail(e))
   })
