@@ -1,8 +1,10 @@
 module Foundation where
 
+import           Control.Applicative ((<$>))
 import qualified Database.Persist
 import           Database.Persist.Sql (SqlBackend)
 import           Model
+import           Model.IsaacVersion
 import           Network.HTTP.Client.Conduit (Manager, HasHttpManager (getHttpManager))
 import           Prelude
 import qualified Settings
@@ -136,11 +138,11 @@ instance YesodAuth App where
         x <- getBy $ UniqueUser $ credsIdent creds
         case x of
             Just (Entity uid _) -> return $ Just uid
-            Nothing -> do
-                fmap Just $ insert User
-                    { userIdent = credsIdent creds
-                    , userPassword = Nothing
-                    }
+            Nothing ->
+              Just <$> insert User
+              { userIdent = credsIdent creds
+              , userPassword = Nothing
+              }
 
     -- You can add other plugins like BrowserID, email or OAuth here
     authPlugins _ = [authBrowserId def]

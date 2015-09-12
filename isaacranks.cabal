@@ -16,6 +16,7 @@ library
                      Foundation
                      Import
                      Model
+                     Model.IsaacVersion
                      Helpers.Heroku
                      Settings
                      Settings.StaticFiles
@@ -40,6 +41,7 @@ library
                 TypeFamilies
                 GADTs
                 GeneralizedNewtypeDeriving
+                LambdaCase
                 FlexibleContexts
                 EmptyDataDecls
                 NoMonomorphismRestriction

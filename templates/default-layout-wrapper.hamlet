@@ -33,9 +33,13 @@ $newline never
                  <div #navbar .navbar-collapse .collapse>
                      <ul .nav .navbar-nav>
                          <li>
-                             <a href=@{VoteR}>Vote
+                             <a href=@{VoteR IsaacAfterbirth}>Vote (Afterbirth)
                          <li>
-                             <a href=@{RanksR}>Ranks
+                             <a href=@{RanksR IsaacAfterbirth}>Ranks (Afterbirth)
+                         <li>
+                             <a href=@{VoteR IsaacRebirth}>Vote (Rebirth)
+                         <li>
+                             <a href=@{RanksR IsaacRebirth}>Ranks (Rebirth)
                          <li>
                              <a href=@{DonateR}>Donate
                          <li>

@@ -6,12 +6,14 @@ import           Data.Binary.Put (runPut, putWord32be)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 import           Data.ByteString.Lazy (toStrict, fromStrict)
+import           Data.Default (def)
 import           Data.List (genericLength)
 import           Data.List (last)
 import qualified Data.Text as T
 import           Data.Text.Encoding (decodeUtf8)
 import           Data.Time (getCurrentTime)
 import           Import
+import           Model.IsaacVersion
 import           Network.Wai (requestHeaders, remoteHost)
 import           Numeric (showFFloat)
 import           System.Random (newStdGen)
@@ -22,9 +24,9 @@ import qualified Web.ClientSession as WS
 jsonToText :: ToJSON a => a -> Text
 jsonToText = decodeUtf8 . toStrict . encode
 
-getVoteR :: Handler TypedContent
-getVoteR = do
-  items <- runDB $ selectList [] []
+getVoteR :: IsaacVersion -> Handler TypedContent
+getVoteR ver = do
+  items <- runDB $ selectList [ItemVersion ==. ver] []
   gen <- lift newStdGen
   let (Entity _ left):(Entity _ right):_ = shuffle' items (length items) gen
   alreadyExpired
@@ -70,8 +72,8 @@ decryptBallot b = do
   let Just b' = WS.decrypt k (BC.pack . T.unpack $ b)
   return $ decodeBallot b'
 
-postVoteR :: Handler TypedContent
-postVoteR = do
+postVoteR :: IsaacVersion -> Handler TypedContent
+postVoteR ver = do
   request <- waiRequest
   let value = T.pack . BC.unpack <$> lookup "X-Forwarded-For" (requestHeaders request)
       voter = maybe
@@ -83,16 +85,16 @@ postVoteR = do
                         <*> ireq checkBoxField "fancy"
   (winner, loser) <- decryptBallot ballot
   timestamp <- lift getCurrentTime
-  _ <- runDB (processVote winner loser timestamp voter ballot fancy)
-  getVoteR
+  _ <- runDB (processVote ver winner loser timestamp voter ballot fancy)
+  getVoteR ver
 
-getRanksR :: Handler Html
-getRanksR = do
+getRanksR :: IsaacVersion -> Handler TypedContent
+getRanksR ver = do
   let ranks :: [Integer]
       ranks = [1..]
       showF x = showFFloat (Just 2) x ""
   (items, votesCast) <- runDB $ (,)
-    <$> ((ranks `zip`) <$> selectList [] [Desc ItemRating])
+    <$> ((ranks `zip`) <$> selectList [ItemVersion ==. ver] [Desc ItemRating])
     <*> count ([] :: [Filter Vote])
   let items' = map (entityVal . snd) items
       totalItems = genericLength items
@@ -104,6 +106,15 @@ getRanksR = do
       maxRating = maximum . map itemRating $ items'
       ratingRange = maxRating - minRating
       normalizedRating item = (itemRating item - minRating) / ratingRange * 1000
-  defaultLayout $ do
-    setTitle "Isaac item ranks"
-    $(widgetFile "ranks")
+  selectRep $ do
+    provideRep . defaultLayout $ do
+      setTitle "Isaac item ranks"
+      addScript (StaticR js_bundle_js)
+      $(widgetFile "ranks")
+    provideJson $ object
+      [ "items" .= items'
+      , "votesCast" .= votesCast
+      , "meanVotes" .= meanVotes
+      , "minRating" .= minRating
+      , "maxRating" .= maxRating
+      ]

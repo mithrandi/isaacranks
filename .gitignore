@@ -14,3 +14,4 @@ cabal.sandbox.config
 *.swp
 docker/
 .stack-work/
+node_modules/

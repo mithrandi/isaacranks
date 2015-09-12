@@ -14,7 +14,7 @@ $newline never
           <a .center-block .rebirth-item class="r-itm#{itemImageId left}" href=#{itemWiki left}>
           <p>#{itemDescription left}
         <div .panel-footer>
-          <form method=POST action=@{VoteR}>
+          <form method=POST action=@{VoteR ver}>
             <input type=hidden name=ballot value=#{ballotLeft}>
             <button .btn .btn-default type=submit>Choose
 
@@ -25,7 +25,7 @@ $newline never
         <div .panel-body>
           <p>I don't know / can't decide
         <div .panel-footer>
-          <form method=GET action=@{VoteR}>
+          <form method=GET action=@{VoteR ver}>
           <button .btn .btn-default type=submit>Reroll!
 
     <div .col-md-4>
@@ -37,7 +37,7 @@ $newline never
           <a .center-block .rebirth-item class="r-itm#{itemImageId right}" href=#{itemWiki right}>
           <p>#{itemDescription right}
         <div .panel-footer>
-          <form method=POST action=@{VoteR}>
+          <form method=POST action=@{VoteR ver}>
             <input type=hidden name=ballot value="#{ballotRight}">
             <button .btn .btn-default type=submit>Choose
 

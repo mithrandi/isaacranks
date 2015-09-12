@@ -1,11 +1,12 @@
 module Model where
 
-import Yesod
 import Data.Text (Text)
-import Database.Persist.Quasi
-import Data.Typeable (Typeable)
 import Data.Time (UTCTime)
+import Data.Typeable (Typeable)
+import Database.Persist.Quasi
+import Model.IsaacVersion
 import Prelude
+import Yesod
 
 -- You can define all of your database entities in the entities file.
 -- You can find more information on persistent and how to declare entities

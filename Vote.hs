@@ -8,6 +8,7 @@ import           Data.Time (UTCTime)
 import           Database.Persist.Sql (SqlBackend)
 import           Debug.Trace (traceShow)
 import           Import
+import           Model.IsaacVersion
 
 k :: Double
 k = 24.0
@@ -18,11 +19,11 @@ adjustment s e = k * (s - e)
 expected :: Double -> Double -> Double
 expected r1 r2 = 1 / (1 + 10 ** ((r2 - r1) / 400))
 
-processVote :: MonadIO m => Int -> Int -> UTCTime -> Text -> Text -> Bool -> ReaderT SqlBackend m (Key Vote)
-processVote w l timestamp voter rawBallot fancy = do
-  Just (Entity w' _) <- getBy $ UniqueItem w
-  Just (Entity l' _) <- getBy $ UniqueItem l
-  insert $ Vote w' l' timestamp voter (Just rawBallot) (Just fancy)
+processVote :: MonadIO m => IsaacVersion -> Int -> Int -> UTCTime -> Text -> Text -> Bool -> ReaderT SqlBackend m (Key Vote)
+processVote ver w l timestamp voter rawBallot fancy = do
+  Just (Entity w' _) <- getBy $ UniqueItem ver w
+  Just (Entity l' _) <- getBy $ UniqueItem ver l
+  insert $ Vote ver w' l' timestamp voter (Just rawBallot) (Just fancy)
 
 applyVote :: M.Map (Key Item) Item -> Vote -> M.Map (Key Item) Item
 applyVote items vote =
