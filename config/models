@@ -26,3 +26,4 @@ Vote json
     voter Text default=''
     rawBallot Text Maybe
     UniqueBallot rawBallot !force
+    fancy Bool Maybe

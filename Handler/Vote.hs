@@ -78,10 +78,12 @@ postVoteR = do
               (T.pack . show $ remoteHost request)
               (T.stripStart . T.stripEnd . last . T.splitOn ",")
               value
-  ballot <- runInputPost $ ireq textField "ballot"
+  (ballot, fancy) <- runInputPost $
+                    (,) <$> ireq textField "ballot"
+                        <*> ireq checkBoxField "fancy"
   (winner, loser) <- decryptBallot ballot
   timestamp <- lift getCurrentTime
-  _ <- runDB (processVote winner loser timestamp voter ballot)
+  _ <- runDB (processVote winner loser timestamp voter ballot fancy)
   getVoteR
 
 getRanksR :: Handler Html

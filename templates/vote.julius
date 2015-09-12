@@ -91,7 +91,7 @@ BallotStore.prototype.checkTimeout = function () {
 BallotStore.prototype.vote = function (ballot) {
     if (!this.checkTimeout()) return;
     this.castBallot();
-    $.post(document.location, {'ballot': ballot}, null, 'json').then(
+    $.post(document.location, {'ballot': ballot, 'fancy': 'yes'}, null, 'json').then(
         this.newBallot.bind(this));
 };
 
