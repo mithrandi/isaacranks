@@ -30,7 +30,6 @@ module.exports =
       , exclude: /node_modules/
       , include: __dirname
       }
-    , { test: /\.json$/, loader: "json-loader" }
     ]
   }
 };
