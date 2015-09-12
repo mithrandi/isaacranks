@@ -25,7 +25,7 @@ class RanksTable extends React.Component {
   render() {
     const {minRating, maxRating} = this.props
     const ratingRange = maxRating - minRating
-    const items = this.props.items.map(function (item, index) {
+    const items = this.props.items.map((item, index) => {
       const norm = (item.rating - minRating) / ratingRange * 1000
       return <Item key={item.isaacId} index={index} item={item} norm={norm} />
     })
@@ -115,7 +115,7 @@ const initialState = (
   , error: null
   })
 
-const store = createStore(function (state = initialState, action) {
+const store = createStore((state = initialState, action) => {
   switch (action.type) {
     case LOAD_RANKS:
       return Object.assign(
@@ -144,13 +144,13 @@ React.render(
 fetch(
   '',
   { headers: new Headers({'Accept': 'application/json'})
-  }).then(function (response) {
+  }).then((response) => {
     if (response.status != 200) {
       throw new Error(response.statusText)
     }
     return response.json()
-  }).then(function (data) {
+  }).then((data) => {
     store.dispatch(loadRanks(data))
-  }).catch(function (e) {
+  }).catch((e) => {
     store.dispatch(errorFail(e))
   })
