@@ -116,6 +116,7 @@ executable rebuildranks
                      , isaacranks
                      , yesod
                      , persistent
+                     , persistent-postgresql
                      , monad-logger
 
     ghc-options:       -threaded -O2 -rtsopts -with-rtsopts=-N
