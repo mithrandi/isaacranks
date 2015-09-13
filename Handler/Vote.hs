@@ -6,7 +6,6 @@ import           Data.Binary.Put (runPut, putWord32be)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 import           Data.ByteString.Lazy (toStrict, fromStrict)
-import           Data.Default (def)
 import           Data.List (genericLength)
 import           Data.List (last)
 import qualified Data.Text as T
@@ -14,6 +13,7 @@ import           Data.Text.Encoding (decodeUtf8)
 import           Data.Time (getCurrentTime)
 import           Import
 import           Model.IsaacVersion
+import           Model.IsaacPool
 import           Network.Wai (requestHeaders, remoteHost)
 import           Numeric (showFFloat)
 import           System.Random (newStdGen)

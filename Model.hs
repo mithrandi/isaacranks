@@ -5,6 +5,7 @@ import Data.Time (UTCTime)
 import Data.Typeable (Typeable)
 import Database.Persist.Quasi
 import Model.IsaacVersion
+import Model.IsaacPool
 import Prelude
 import Yesod
 

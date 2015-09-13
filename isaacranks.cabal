@@ -17,6 +17,7 @@ library
                      Import
                      Model
                      Model.IsaacVersion
+                     Model.IsaacPool
                      Helpers.Heroku
                      Settings
                      Settings.StaticFiles

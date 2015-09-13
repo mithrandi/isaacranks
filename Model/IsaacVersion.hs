@@ -1,4 +1,4 @@
-module Model.IsaacVersion where
+module Model.IsaacVersion (IsaacVersion(..)) where
 
 import Data.Aeson.TH
 import Data.Char (toLower)
@@ -11,7 +11,7 @@ data IsaacVersion = IsaacRebirth
                   deriving (Show, Read, Eq, Ord)
 
 derivePersistField "IsaacVersion"
-$(deriveJSON defaultOptions{fieldLabelModifier = drop 4, constructorTagModifier = map toLower} ''IsaacVersion)
+$(deriveJSON defaultOptions{constructorTagModifier = map toLower . drop 5} ''IsaacVersion)
 
 instance PathPiece IsaacVersion where
   toPathPiece = \case

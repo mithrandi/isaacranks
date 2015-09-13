@@ -18,6 +18,7 @@ Item json
     wiki Text default=''
     rating Double
     votes Int
+    pools [IsaacPool] default='[]'
     UniqueItem version isaacId
 
 Vote json

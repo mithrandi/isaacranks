@@ -16,6 +16,7 @@ class Item extends React.Component {
         <td>{item.rating.toFixed(2)}</td>
         <td>{norm.toFixed(2)}</td>
         <td>{item.votes}</td>
+        <td>{JSON.stringify(item.pools)}</td>
       </tr>
     )
   }
@@ -40,6 +41,7 @@ class RanksTable extends React.Component {
             <th>Rating</th>
             <th>Normalized</th>
             <th>Votes</th>
+            <th>Pools</th>
           </tr>
           {items}
         </table>
@@ -89,6 +91,7 @@ Ranks.propTypes = (
         , wiki: P.string.isRequired
         , rating: P.number.isRequired
         , votes: P.number.isRequired
+        , pools: P.arrayOf(P.string.isRequired).isRequired
         }))
     })
   })
