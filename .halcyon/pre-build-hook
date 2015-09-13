@@ -3,4 +3,4 @@ tag=$1
 source_dir=$2
 build_dir=$3
 echo $build_dir
-(cd $build_dir && npm run build)
+(cd $build_dir && npm run build && rm -rf .heroku node_modules)
