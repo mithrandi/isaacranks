@@ -49,7 +49,7 @@ const poolNames =
 
 class Filters extends React.Component {
   render() {
-    const {pools, onToggle} = this.props
+    const {pools, onToggle, onAll, onNone} = this.props
     const buttons = poolNames.map(
       ([name, label]) =>
         <FilterButton name={name} key={name} label={label} pools={pools} onToggle={onToggle} />)
@@ -57,6 +57,10 @@ class Filters extends React.Component {
       <ButtonToolbar>
         <ButtonGroup>
           {buttons}
+        </ButtonGroup>
+        <ButtonGroup>
+          <Button onClick={onAll}>All</Button>
+          <Button onClick={onNone}>None</Button>
         </ButtonGroup>
       </ButtonToolbar>
     )
@@ -109,6 +113,8 @@ class Ranks extends React.Component {
     const {items, votesCast, meanVotes, minRating, maxRating} = this.props.ranks
     const dispatch = this.props.dispatch
     const onToggle = (name) => dispatch(togglePool(name))
+    const onAll = () => dispatch(allPools())
+    const onNone = () => dispatch(noPools())
     return (
       <div>
         <div className="jumbotron">
@@ -116,7 +122,7 @@ class Ranks extends React.Component {
           <p>{votesCast} votes total, mean of {meanVotes.toFixed(2)} per item.</p>
           <p>Normalized rating is normalized to range [0, 1000].</p>
         </div>
-        <Filters pools={this.props.pools} onToggle={onToggle} />
+        <Filters pools={this.props.pools} onToggle={onToggle} onAll={onAll} onNone={onNone} />
         <RanksTable items={items} minRating={minRating} maxRating={maxRating} pools={this.props.pools} />
       </div>
     )
@@ -168,10 +174,20 @@ function togglePool(name) {
          }
 }
 
+const POOLS_ALL = 'POOLS_ALL'
+function allPools() {
+  return { type: POOLS_ALL }
+}
+
+const POOLS_NONE = 'POOLS_NONE'
+function noPools() {
+  return { type: POOLS_NONE }
+}
+
 const initialState = (
   { loading: true
   , error: null
-  , pools: Set.of('ItemRoom')
+  , pools: Set(poolNames.map(([name, label]) => name))
   })
 
 const store = createStore((state = initialState, action) => {
@@ -192,9 +208,18 @@ const store = createStore((state = initialState, action) => {
     case TOGGLE_POOL:
       const pools = state.pools
       if (pools.has(action.name))
-        return Object.assign({}, state, { pools: pools.remove(action.name) })
+        return Object.assign(
+          {}, state, { pools: pools.remove(action.name) })
       else
-        return Object.assign({}, state, { pools: pools.add(action.name) })
+        return Object.assign(
+          {}, state, { pools: pools.add(action.name) })
+    case POOLS_ALL:
+      return Object.assign(
+        {}, state,
+        { pools: Set(poolNames.map(([name, label]) => name)) })
+    case POOLS_NONE:
+      return Object.assign(
+        {}, state, { pools: Set() })
   }
   return state
 })
