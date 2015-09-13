@@ -26,6 +26,7 @@ library
                      Handler.Vote
                      Handler.Donate
                      Vote
+    other-modules: Paths_isaacranks
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
