@@ -68,13 +68,11 @@ makeFoundation :: AppConfig DefaultEnv Extra -> IO App
 makeFoundation conf = do
     manager <- newManager
     s <- staticSite
-#if DEVELOPMENT
-    dbconf <- withYamlEnvironment "config/postgresql.yml" (appEnv conf)
-              Database.Persist.loadConfig >>=
-              Database.Persist.applyEnv
-#else
-    dbconf <- herokuConf
-#endif
+    dbconf <- if development
+             then withYamlEnvironment "config/postgresql.yml" (appEnv conf)
+                  Database.Persist.loadConfig >>=
+                  Database.Persist.applyEnv
+             else herokuConf
 
     loggerSet' <- newStdoutLoggerSet defaultBufSize
     (getter, _) <- clockDateCacher

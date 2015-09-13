@@ -13,7 +13,6 @@ import           Data.Text.Encoding (decodeUtf8)
 import           Data.Time (getCurrentTime)
 import           Import
 import           Model.IsaacVersion
-import           Model.IsaacPool
 import           Network.Wai (requestHeaders, remoteHost)
 import           Numeric (showFFloat)
 import           System.Random (newStdGen)
