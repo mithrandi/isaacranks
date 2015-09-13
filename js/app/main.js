@@ -2,6 +2,8 @@ import 'babel-core/polyfill'
 import React, {PropTypes as P} from 'react'
 import {createStore} from 'redux'
 import {Provider, connect} from 'react-redux'
+import {Set} from 'immutable'
+import {Button, ButtonGroup, ButtonToolbar} from 'react-bootstrap'
 
 
 class Item extends React.Component {
@@ -16,34 +18,77 @@ class Item extends React.Component {
         <td>{item.rating.toFixed(2)}</td>
         <td>{norm.toFixed(2)}</td>
         <td>{item.votes}</td>
-        <td>{JSON.stringify(item.pools)}</td>
       </tr>
+    )
+  }
+}
+
+class FilterButton extends React.Component {
+  render() {
+    const {name, pools, label, onToggle} = this.props
+    const bsStyle = pools.has(name) ? 'success' : 'danger';
+    return <Button bsStyle={bsStyle} onClick={() => onToggle(name)}>{label}</Button>
+  }
+}
+
+const poolNames =
+  [ ["ItemRoom", "Item"]
+  , ["Shop", "Shop"]
+  , ["BossRoom", "Boss"]
+  , ["DevilRoom", "Devil"]
+  , ["AngelRoom", "Angel"]
+  , ["SecretRoom", "Secret"]
+  , ["Library", "Library"]
+  , ["GoldenChest", "Golden Chest"]
+  , ["RedChest", "Red Chest"]
+  , ["CurseRoom", "Curse"]
+  , ["Beggar", "Beggar"]
+  , ["DemonBeggar", "Demon Beggar"]
+  , ["KeyBeggar", "Key Beggar"]
+  ]
+
+class Filters extends React.Component {
+  render() {
+    const {pools, onToggle} = this.props
+    const buttons = poolNames.map(
+      ([name, label]) =>
+        <FilterButton name={name} key={name} label={label} pools={pools} onToggle={onToggle} />)
+    return (
+      <ButtonToolbar>
+        <ButtonGroup>
+          {buttons}
+        </ButtonGroup>
+      </ButtonToolbar>
     )
   }
 }
 
 class RanksTable extends React.Component {
   render() {
-    const {minRating, maxRating} = this.props
+    const {minRating, maxRating, pools} = this.props
     const ratingRange = maxRating - minRating
     const items = this.props.items.map((item, index) => {
       const norm = (item.rating - minRating) / ratingRange * 1000
-      return <Item key={item.isaacId} index={index} item={item} norm={norm} />
+      if (Set(item.pools).intersect(pools).size > 0)
+        return <Item key={item.isaacId} index={index} item={item} norm={norm} />
     })
     return (
       <div className="table-responsive">
         <table className="table table-condensed table-hover">
-          <tr>
-            <th>#</th>
-            <th>Item ID</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Rating</th>
-            <th>Normalized</th>
-            <th>Votes</th>
-            <th>Pools</th>
-          </tr>
-          {items}
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Item ID</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Rating</th>
+              <th>Normalized</th>
+              <th>Votes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items}
+          </tbody>
         </table>
       </div>
     )
@@ -62,6 +107,8 @@ class Ranks extends React.Component {
       )
     }
     const {items, votesCast, meanVotes, minRating, maxRating} = this.props.ranks
+    const dispatch = this.props.dispatch
+    const onToggle = (name) => dispatch(togglePool(name))
     return (
       <div>
         <div className="jumbotron">
@@ -69,7 +116,8 @@ class Ranks extends React.Component {
           <p>{votesCast} votes total, mean of {meanVotes.toFixed(2)} per item.</p>
           <p>Normalized rating is normalized to range [0, 1000].</p>
         </div>
-        <RanksTable items={items} minRating={minRating} maxRating={maxRating} />
+        <Filters pools={this.props.pools} onToggle={onToggle} />
+        <RanksTable items={items} minRating={minRating} maxRating={maxRating} pools={this.props.pools} />
       </div>
     )
   }
@@ -113,9 +161,17 @@ function errorFail(e) {
          }
 }
 
+const TOGGLE_POOL = 'TOGGLE_POOL'
+function togglePool(name) {
+  return { type: TOGGLE_POOL
+         , name: name
+         }
+}
+
 const initialState = (
   { loading: true
   , error: null
+  , pools: Set.of('ItemRoom')
   })
 
 const store = createStore((state = initialState, action) => {
@@ -133,6 +189,12 @@ const store = createStore((state = initialState, action) => {
         { loading: false
         , error: action.error.toString()
         })
+    case TOGGLE_POOL:
+      const pools = state.pools
+      if (pools.has(action.name))
+        return Object.assign({}, state, { pools: pools.remove(action.name) })
+      else
+        return Object.assign({}, state, { pools: pools.add(action.name) })
   }
   return state
 })

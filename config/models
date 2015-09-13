@@ -20,6 +20,7 @@ Item json
     votes Int
     pools [IsaacPool] default='[]'
     UniqueItem version isaacId
+    deriving Show
 
 Vote json
     version IsaacVersion default='IsaacRebirth'
