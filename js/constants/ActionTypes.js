@@ -1,0 +1,5 @@
+export const LOAD_RANKS = 'LOAD_RANKS'
+export const ERROR_FAIL = 'ERROR_FAIL'
+export const TOGGLE_POOL = 'TOGGLE_POOL'
+export const POOLS_ALL = 'POOLS_ALL'
+export const POOLS_NONE = 'POOLS_NONE'
