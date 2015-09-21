@@ -14,7 +14,6 @@ import           Data.Time (getCurrentTime)
 import           Import
 import           Model.IsaacVersion
 import           Network.Wai (requestHeaders, remoteHost)
-import           Numeric (showFFloat)
 import           System.Random (newStdGen)
 import           System.Random.Shuffle (shuffle')
 import           Vote (processVote)
@@ -91,7 +90,6 @@ getRanksR :: IsaacVersion -> Handler TypedContent
 getRanksR ver = do
   let ranks :: [Integer]
       ranks = [1..]
-      showF x = showFFloat (Just 2) x ""
   (items, votesCast) <- runDB $ (,)
     <$> ((ranks `zip`) <$> selectList [ItemVersion ==. ver] [Desc ItemRating])
     <*> count ([] :: [Filter Vote])
@@ -99,12 +97,8 @@ getRanksR ver = do
       totalItems = genericLength items
       meanVotes :: Double
       meanVotes = fromIntegral (votesCast * 2) / totalItems
-      meanRating :: Double
-      meanRating = (sum . map itemRating) items' / totalItems
       minRating = minimum . map itemRating $ items'
       maxRating = maximum . map itemRating $ items'
-      ratingRange = maxRating - minRating
-      normalizedRating item = (itemRating item - minRating) / ratingRange * 1000
   selectRep $ do
     provideRep . defaultLayout $ do
       setTitle "Isaac item ranks"
