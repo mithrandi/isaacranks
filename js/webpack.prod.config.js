@@ -26,7 +26,13 @@ module.exports =
   { loaders:
     [ { test: /\.js$/
       , loader: ['babel']
-      , query: { optional: ['runtime'] }
+      , query:
+        { optional:
+          //[ 'runtime'
+          [ 'optimisation.react.constantElements'
+          , 'optimisation.react.inlineElements'
+          ]
+        }
       , exclude: /node_modules/
       , include: __dirname
       }

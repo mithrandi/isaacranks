@@ -1,8 +1,10 @@
-import { combineReducers } from 'redux'
+import {combineReducers} from 'redux'
+import {routerStateReducer} from 'redux-router'
 import ranks from './ranks'
 
 const rootReducer = combineReducers(
-  { ranks }
+  { router: routerStateReducer
+  , ranks }
   )
 
 export default rootReducer
