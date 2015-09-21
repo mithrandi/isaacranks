@@ -1,9 +1,5 @@
 $newline never
 \<!doctype html>
-\<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
-\<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
-\<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
-\<!--[if gt IE 8]><!-->
 <html class="no-js" lang="en"> <!--<![endif]-->
     <head>
         <meta charset="UTF-8">
@@ -16,10 +12,6 @@ $newline never
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
         ^{pageHead pc}
-
-        \<!--[if lt IE 9]>
-        \<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-        \<![endif]-->
     <body>
         <nav .navbar .navbar-inverse .navbar-fixed-top>
             <div .container>
