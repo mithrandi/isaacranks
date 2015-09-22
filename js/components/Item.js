@@ -1,6 +1,12 @@
 import React, {PropTypes as P} from 'react'
 
-class Item extends React.Component {
+export default class Item extends React.Component {
+  static propTypes =
+  { index: P.number.isRequired
+  , item: P.object.isRequired
+  , norm: P.number.isRequired
+  }
+
   render() {
     const {index, item, norm} = this.props
     return (
@@ -16,11 +22,3 @@ class Item extends React.Component {
     )
   }
 }
-
-Item.propTypes =
-{ index: P.number.isRequired
-, item: P.object.isRequired
-, norm: P.number.isRequired
-}
-
-export default Item

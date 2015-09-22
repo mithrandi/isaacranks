@@ -2,7 +2,12 @@ import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router'
 
-class App extends Component {
+@connect(state => ({routerState: state.router}))
+export default class App extends Component {
+  static propTypes =
+  { children: PropTypes.node
+  }
+
   render() {
     return (
       <div>
@@ -30,24 +35,10 @@ class App extends Component {
         <div className="container">
           {this.props.children}
           <footer>
-            Website © 2014-2015
-            <a href="mailto:mithrandi@mithrandi.net">Tristan Seligmann</a>
-            — I do not hold the copyright to any content from
-            <a href="http://bindingofisaac.com/">The Binding of Isaac: Rebirth</a>
-            or The Binding of Isaac: Afterbirth
-            — Special thanks to
-            <a href="https://www.reddit.com/r/bindingofisaac/">/r/bindingofisaac</a>
-            and
-            <a href="http://platinumgod.co.uk/">platinumgod.co.uk</a>a>
+            Website © 2014-2015 <a href="mailto:mithrandi@mithrandi.net">Tristan Seligmann</a> — I do not hold the copyright to any content from <a href="http://bindingofisaac.com/">The Binding of Isaac: Rebirth</a> or The Binding of Isaac: Afterbirth — Special thanks to <a href="https://www.reddit.com/r/bindingofisaac/">/r/bindingofisaac</a> and <a href="http://platinumgod.co.uk/">platinumgod.co.uk</a>
           </footer>
         </div>
       </div>
       )
   }
 }
-
-App.propTypes =
-{ children: PropTypes.node
-}
-
-export default connect(state => ({routerState: state.router}))(App)

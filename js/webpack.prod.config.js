@@ -32,6 +32,7 @@ module.exports =
           [ 'optimisation.react.constantElements'
           , 'optimisation.react.inlineElements'
           ]
+        , stage: 0
         }
       , exclude: /node_modules/
       , include: __dirname

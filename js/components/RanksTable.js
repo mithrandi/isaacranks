@@ -3,7 +3,14 @@ import {Set} from 'immutable'
 import IP from 'react-immutable-proptypes'
 import Item from './Item'
 
-class RanksTable extends React.Component {
+export default class RanksTable extends React.Component {
+  static propTypes =
+  { minRating: P.number.isRequired
+  , maxRating: P.number.isRequired
+  , pools: IP.set.isRequired
+  , items: P.arrayOf(P.object).isRequired
+  }
+
   render() {
     const {minRating, maxRating, pools} = this.props
     const ratingRange = maxRating - minRating
@@ -34,12 +41,3 @@ class RanksTable extends React.Component {
     )
   }
 }
-
-RanksTable.propTypes =
-{ minRating: P.number.isRequired
-, maxRating: P.number.isRequired
-, pools: IP.set.isRequired
-, items: P.arrayOf(P.object).isRequired
-}
-
-export default RanksTable

@@ -6,10 +6,33 @@ import RanksTable from '../components/RanksTable'
 import * as RanksActions from '../actions/Ranks'
 
 
-class Ranks extends React.Component {
+function mapStateToProps(state) {
+  return state.ranks
+}
+
+function mapDispatchToProps(dispatch) {
+  return {actions: bindActionCreators(RanksActions, dispatch)}
+}
+
+@connect(mapStateToProps, mapDispatchToProps)
+export default class Ranks extends React.Component {
+  static propTypes =
+  { actions: P.objectOf(P.func).isRequired
+  , ranks: P.object
+  }
+
+  componentDidMount() {
+    this.props.actions.loadRanks(this.props.params.version)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    nextProps.actions.loadRanks(nextProps.params.version)
+  }
+
   render() {
-    if (this.props.loading || this.props.error) {
-      const message = this.props.loading ? 'Loading...' : this.props.error
+    const ranks = this.props.ranks[this.props.params.version]
+    if (ranks === undefined || ranks.loading || ranks.error) {
+      const message = ranks === undefined || ranks.loading ? 'Loading...' : ranks.error
       return (
         <div className="jumbotron">
           <h1>Item ranks</h1>
@@ -17,7 +40,7 @@ class Ranks extends React.Component {
         </div>
       )
     }
-    const {items, votesCast, meanVotes, minRating, maxRating} = this.props.ranks
+    const {items, votesCast, meanVotes, minRating, maxRating} = ranks
     const {actions} = this.props
     return (
       <div>
@@ -32,35 +55,3 @@ class Ranks extends React.Component {
     )
   }
 }
-Ranks.propTypes =
-{ actions: P.objectOf(P.func).isRequired
-, loading: P.bool.isRequired
-, error: P.string
-, ranks: P.shape(
-  { votesCast: P.number.isRequired
-  , meanVotes: P.number.isRequired
-  , minRating: P.number.isRequired
-  , maxRating: P.number.isRequired
-  , items: P.arrayOf(
-    P.shape(
-      { isaacId: P.number.isRequired
-      , imageId: P.string.isRequired
-      , name: P.string.isRequired
-      , description: P.string.isRequired
-      , wiki: P.string.isRequired
-      , rating: P.number.isRequired
-      , votes: P.number.isRequired
-      , pools: P.arrayOf(P.string.isRequired).isRequired
-      }))
-  })
-}
-
-function mapStateToProps(state) {
-  return state.ranks
-}
-
-function mapDispatchToProps(dispatch) {
-  return {actions: bindActionCreators(RanksActions, dispatch)}
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Ranks)

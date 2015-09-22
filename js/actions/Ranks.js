@@ -1,27 +1,34 @@
-import {LOAD_RANKS, ERROR_FAIL, TOGGLE_POOL, POOLS_ALL, POOLS_NONE} from '../constants/ActionTypes'
+import * as A from '../constants/ActionTypes'
+import {FETCH_DATA} from '../middleware/fetch'
 
-export function loadRanks(data) {
-  return { type: LOAD_RANKS
-         , data: data
-         }
-}
-
-export function errorFail(e) {
-  return { type: ERROR_FAIL
-         , error: e
-         }
+export function loadRanks(version) {
+  return (dispatch, getState) => {
+    const state = getState()
+    if (state.ranks.ranks[version] !== undefined)
+      return null
+    return dispatch(
+      { [FETCH_DATA]:
+        { method: 'GET'
+        , uri: `/${version}/ranks`
+        , started: A.LOAD_RANKS_LOADING
+        , success: A.LOAD_RANKS_SUCCESS
+        , failure: A.LOAD_RANKS_FAILURE
+        }
+      , version: version
+      })
+  }
 }
 
 export function togglePool(name) {
-  return { type: TOGGLE_POOL
+  return { type: A.TOGGLE_POOL
          , name: name
          }
 }
 
 export function allPools() {
-  return { type: POOLS_ALL }
+  return { type: A.POOLS_ALL }
 }
 
 export function noPools() {
-  return { type: POOLS_NONE }
+  return { type: A.POOLS_NONE }
 }

@@ -4,7 +4,14 @@ import {Button, ButtonToolbar, ButtonGroup} from 'react-bootstrap'
 import FilterButton from './FilterButton'
 import poolNames from '../constants/pools'
 
-class Filters extends React.Component {
+export default class Filters extends React.Component {
+  static propTypes =
+  { pools: IP.set.isRequired
+  , onToggle: P.func.isRequired
+  , onAll: P.func.isRequired
+  , onNone: P.func.isRequired
+  }
+
   render() {
     const {pools, onToggle, onAll, onNone} = this.props
     const buttons = poolNames.map(
@@ -23,12 +30,3 @@ class Filters extends React.Component {
     )
   }
 }
-
-Filters.propTypes =
-{ pools: IP.set.isRequired
-, onToggle: P.func.isRequired
-, onAll: P.func.isRequired
-, onNone: P.func.isRequired
-}
-
-export default Filters
