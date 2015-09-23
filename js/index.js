@@ -5,6 +5,7 @@ import {Provider} from 'react-redux'
 import {Route, Link} from 'react-router'
 import {ReduxRouter} from 'redux-router'
 import App from './containers/App'
+import Vote from './containers/Vote'
 import Ranks from './containers/Ranks'
 import configureStore from './store/configureStore'
 import {loadRanks, errorFail} from './actions/Ranks'
@@ -15,6 +16,7 @@ class Root extends Component {
       <Provider store={this.props.store}>
         <ReduxRouter>
           <Route path="/" component={App}>
+            <Route path=":version/vote" component={Vote} />
             <Route path=":version/ranks" component={Ranks} />
           </Route>
         </ReduxRouter>

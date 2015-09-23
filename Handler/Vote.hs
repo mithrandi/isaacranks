@@ -43,6 +43,7 @@ getVoteR ver = do
       addScriptRemote "http://static.isaacranks.com/scripts/react-with-addons-0.13.3"
       addStylesheetRemote "http://static.isaacranks.com/styles/font-awesome-4.2.0"
       setTitle "Isaac item ranks"
+      addScript (StaticR js_bundle_js)
       $(widgetFile "vote")
     provideJson ballotJson
 

@@ -8,7 +8,8 @@ export default function fetchMiddleware(store) {
 
     const {method, uri, data, started, success, failure} = request
     const actionWith = (props) => Object.assign({}, action, props)
-    next(actionWith({type: started}))
+    if (started != null)
+      next(actionWith({type: started}))
     fetch(
       uri,
       { method: method

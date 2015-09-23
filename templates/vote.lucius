@@ -1,6 +1,6 @@
 .voting-enter {
     opacity: 0;
-    transition: opacity .15s linear;
+    transition: opacity .3s linear;
 }
 
 .voting-enter.voting-enter-active {
