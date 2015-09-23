@@ -1,5 +1,5 @@
 import {VOTE_BALLOT, LOAD_BALLOT, LOAD_BALLOT_FAILURE, RESET_BALLOT, REROLL_BALLOT} from '../constants/ActionTypes'
-import {fromJS, Map, List} from 'immutable'
+import {fromJS} from 'immutable'
 
 const initialState = fromJS(
   { 'rebirth':

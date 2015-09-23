@@ -6,7 +6,7 @@ export default class VotingItemPanel extends React.Component {
   static propTypes = {'ballot': IP.map}
 
   render() {
-    const {ballot} = this.props;
+    const {ballot} = this.props
     if (!ballot.get('ballot'))
       return (
         <VotingPanel bsStyle="primary" title="...">

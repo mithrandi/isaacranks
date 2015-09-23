@@ -1,6 +1,5 @@
 import {VOTE_BALLOT, LOAD_BALLOT, LOAD_BALLOT_FAILURE, RESET_BALLOT, REROLL_BALLOT} from '../constants/ActionTypes'
 import {FETCH_DATA} from '../middleware/fetch'
-import {List} from 'immutable'
 
 export function loadBallot(version) {
   return (dispatch, getState) => {

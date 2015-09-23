@@ -1,14 +1,13 @@
 import 'babel/polyfill'
-import React, {Component, PropTypes as P} from 'react'
+import {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
-import {Route, Link} from 'react-router'
+import {Route} from 'react-router'
 import {ReduxRouter} from 'redux-router'
 import App from './containers/App'
 import Vote from './containers/Vote'
 import Ranks from './containers/Ranks'
 import configureStore from './store/configureStore'
-import {loadRanks, errorFail} from './actions/Ranks'
 
 class Root extends Component {
   render() {
