@@ -17,7 +17,7 @@ export default class VotingBooth extends React.Component {
     return (
       <Row>
         <CSSTransitionGroup transitionName="voting"
-                            transitionEnterTimeout={300}
+                            transitionEnterTimeout={150}
                             transitionLeave={false}
                             component="div">
           <VotingItemPanel key={left.get('ballot')} ballot={left} />
@@ -29,7 +29,7 @@ export default class VotingBooth extends React.Component {
           I don't know / can't decide
         </VotingPanel>
         <CSSTransitionGroup transitionName="voting"
-                            transitionEnterTimeout={300}
+                            transitionEnterTimeout={150}
                             transitionLeave={false}
                             component="div">
           <VotingItemPanel key={right.get('ballot')} ballot={right} />
