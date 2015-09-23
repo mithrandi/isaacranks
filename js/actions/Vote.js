@@ -1,4 +1,4 @@
-import {VOTE_BALLOT, LOAD_BALLOT, LOAD_BALLOT_FAILURE, RESET_BALLOT} from '../constants/ActionTypes'
+import {VOTE_BALLOT, LOAD_BALLOT, LOAD_BALLOT_FAILURE, RESET_BALLOT, REROLL_BALLOT} from '../constants/ActionTypes'
 import {FETCH_DATA} from '../middleware/fetch'
 import {List} from 'immutable'
 
@@ -39,7 +39,10 @@ export function voteFor(version, ballot) {
     })
 }
 
-
 export function reset() {
   return {type: RESET_BALLOT}
+}
+
+export function reroll(version) {
+  return {type: REROLL_BALLOT, version: version}
 }

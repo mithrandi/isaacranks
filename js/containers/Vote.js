@@ -49,13 +49,14 @@ export default class Vote extends React.Component {
         () => actions.voteFor(version, ballot.get('ballotRight'))
       , 'ballot': ballot.get('ballotRight')
       })
+    const onReroll = () => actions.reroll(version)
     return (
       <div>
         <div className="jumbotron">
           <h1>Rank items</h1>
           <p>Please select the item you would prefer below:</p>
         </div>
-        <VotingBooth left={left} right={right} />
+        <VotingBooth left={left} right={right} onReroll={onReroll} />
       </div>
       )
   }

@@ -18,6 +18,7 @@ export default class VotingItemPanel extends React.Component {
       <VotingPanel bsStyle="primary"
                    href={ballot.get('wiki')}
                    title={ballot.get('name')}
+                   label="Choose"
                    onVote={ballot.get('onVote')}>
         <a className={className} href={ballot.get('wiki')} />
         {ballot.get('description')}

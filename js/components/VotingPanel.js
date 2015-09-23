@@ -6,6 +6,7 @@ export default class VotingPanel extends React.Component {
   { 'href': P.string
   , 'title': P.string.isRequired
   , 'bsStyle': P.string
+  , 'label': P.string
   , 'onVote': P.func
   , 'children': P.node
   }
@@ -15,7 +16,7 @@ export default class VotingPanel extends React.Component {
                ? (<a href={this.props.href}>{this.props.title}</a>) : this.props.title
     const header = (<h2 className="panel-title">{link}</h2>)
     const footer = this.props.onVote
-                 ? (<Button onClick={this.props.onVote}>Choose</Button>) : null
+                 ? (<Button onClick={this.props.onVote}>{this.props.label}</Button>) : null
     return (
       <Col md={4}>
         <Panel bsStyle={this.props.bsStyle}
