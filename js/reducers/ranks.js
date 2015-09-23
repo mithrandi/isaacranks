@@ -4,7 +4,7 @@ import poolNames from '../constants/pools'
 
 const initialState = (
   { ranks: {}
-  , pools: Set(poolNames.map(([name]) => name))
+  , pools: Set(poolNames.map(([name, desc]) => name))
   })
 
 export default function ranks(state = initialState, action){
@@ -37,7 +37,7 @@ export default function ranks(state = initialState, action){
     case A.POOLS_ALL:
       return Object.assign(
         {}, state,
-        { pools: Set(poolNames.map(([name]) => name)) })
+        { pools: Set(poolNames.map(([name, desc]) => name)) })
     case A.POOLS_NONE:
       return Object.assign(
         {}, state, { pools: Set() })

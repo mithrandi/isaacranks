@@ -1,6 +1,6 @@
 export const FETCH_DATA = Symbol('FETCH_DATA')
 
-export default function fetchMiddleware(/*store*/) {
+export default function fetchMiddleware(store) {
   return next => action => {
     const request = action[FETCH_DATA]
     if (request === undefined)
