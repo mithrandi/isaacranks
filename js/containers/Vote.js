@@ -3,11 +3,12 @@ import IP from 'react-immutable-proptypes'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 import {Map} from 'immutable'
-import VotingBooth from '../components/VotingBooth'
 import * as VoteActions from '../actions/Vote'
+import VotingBooth from '../components/VotingBooth'
+import ErrorPage from '../components/ErrorPage'
 
 function mapStateToProps(state) {
-  return state.voting.toObject()
+  return {voting: state.voting}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -18,7 +19,7 @@ function mapDispatchToProps(dispatch) {
 export default class Vote extends React.Component {
   static propTypes =
   { actions: P.objectOf(P.func).isRequired
-  , ballots: P.objectOf(IP.listOf).isRequired
+  , voting: IP.map.isRequired
   }
 
   componentDidMount() {
@@ -30,17 +31,22 @@ export default class Vote extends React.Component {
   }
 
   render() {
-    const {actions, ballots} = this.props
+    const {actions, voting} = this.props
+    const error = voting.get('error')
+    if (error) {
+      return (<ErrorPage onReset={actions.reset}>{error}</ErrorPage>)
+    }
+
     const {version} = this.props.params
-    const ballot = ballots.getIn([version, 0], Map())
+    const ballot = voting.getIn([version, 'ballots', 0], Map())
     const left = ballot.get('left', Map()).merge(
       { 'onVote':
-        () => actions.voteFor(ballot.get('ballotLeft'))
+        () => actions.voteFor(version, ballot.get('ballotLeft'))
       , 'ballot': ballot.get('ballotLeft')
       })
     const right = ballot.get('right', Map()).merge(
       { 'onVote':
-        () => actions.voteFor(ballot.get('ballotRight'))
+        () => actions.voteFor(version, ballot.get('ballotRight'))
       , 'ballot': ballot.get('ballotRight')
       })
     return (
