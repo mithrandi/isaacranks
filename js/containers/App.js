@@ -1,9 +1,9 @@
-import {Component, PropTypes} from 'react'
+import React, {PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router'
 
 @connect(state => ({routerState: state.router}))
-export default class App extends Component {
+export default class App extends React.Component {
   static propTypes =
   { children: PropTypes.node
   }
