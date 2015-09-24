@@ -28,8 +28,8 @@ module.exports =
       , loader: ['babel']
       , query:
         { optional:
-          //[ 'runtime'
-          [ 'optimisation.react.constantElements'
+          [ 'runtime'
+          , 'optimisation.react.constantElements'
           , 'optimisation.react.inlineElements'
           ]
         , stage: 0

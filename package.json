@@ -2,6 +2,10 @@
   "name": "isaacranks",
   "version": "1.0.0",
   "description": "isaacranks JS application",
+  "engines": {
+    "node": "4.1.1",
+    "npm": "3.3.3"
+  },
   "main": "index.js",
   "scripts": {
     "build": "webpack --display-error-details --config js/webpack.prod.config.js",
