@@ -1,3 +1,4 @@
+body { padding-top: 70px; }
 .voting-enter {
     opacity: 0;
     transition: opacity .15s linear;

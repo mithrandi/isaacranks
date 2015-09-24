@@ -10,6 +10,7 @@ import           Prelude
 import qualified Settings
 import           Settings (widgetFile, Extra (..))
 import           Settings.Development (development)
+import           Settings.StaticFiles
 import           Text.Hamlet (hamletFile)
 import           Text.Jasmine (minifym)
 import qualified Web.ClientSession as WC
@@ -78,6 +79,7 @@ instance Yesod App where
             addStylesheetRemote "http://static.isaacranks.com/styles/bootstrap"
             addStylesheetRemote "http://static.isaacranks.com/styles/bootstrap-theme"
             addStylesheetRemote "http://static.isaacranks.com/styles/icons"
+            addStylesheet $ StaticR css_isaacranks_css
             $(widgetFile "default-layout")
         withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
