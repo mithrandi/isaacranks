@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {Link} from 'react-router'
+import {Navbar, Nav, NavItem} from 'react-bootstrap'
+import {LinkContainer} from 'react-router-bootstrap'
 
 @connect(state => ({routerState: state.router}))
 export default class App extends React.Component {
@@ -11,27 +12,18 @@ export default class App extends React.Component {
   render() {
     return (
       <div>
-        <nav className="navbar navbar-inverse navbar-fixed-top">
-          <div className="container">
-            <div className="navbar-header">
-              <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                <span className="sr-only">Toggle navigation</span>
-                <span className="icon-bar" />
-                <span className="icon-bar" />
-                <span className="icon-bar" />
-              </button>
-              <a className="navbar-brand" href="/">Isaac Ranks</a>
-            </div>
-            <div id="navbar" className="navbar-collapse collapse">
-              <ul className="nav navbar-nav">
-                <li><Link to="/rebirth/vote">Vote (Rebirth)</Link></li>
-                <li><Link to="/rebirth/ranks">Ranks (Rebirth)</Link></li>
-                <li><a href="/donate">Donate</a></li>
-                <li><a href="/changes">News</a></li>
-              </ul>
-            </div>
-          </div>
-        </nav>
+        <Navbar brand={<a href="/">Isaac Ranks</a>} toggleNavKey={0} inverse fixedTop>
+          <Nav navbar eventKey={0}>
+            <LinkContainer to="/rebirth/vote">
+              <NavItem>Vote (Rebirth)</NavItem>
+            </LinkContainer>
+            <LinkContainer to="/rebirth/ranks">
+              <NavItem>Ranks (Rebirth)</NavItem>
+            </LinkContainer>
+            <NavItem href="/donate">Donate</NavItem>
+            <NavItem href="/changes">Changes</NavItem>
+          </Nav>
+        </Navbar>
         <div className="container">
           {this.props.children}
           <footer>
