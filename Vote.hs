@@ -1,16 +1,26 @@
 module Vote where
 
+import           Codec.Compression.GZip (compressWith, defaultCompressParams, bestCompression, CompressParams(compressLevel))
 import           Control.Lens
 import           Control.Monad (forM_)
 import           Control.Monad.Trans.Reader (ReaderT)
+import           Data.Aeson (encode)
 import           Data.Aeson.Lens (_JSON, _Object, _Array)
+import qualified Data.ByteString.Lazy as LBS
 import           Data.List (foldl')
 import qualified Data.Map.Strict as M
+import           Data.Maybe (fromMaybe)
+import qualified Data.Text as T
+import qualified Data.Text.IO as TI
 import           Data.Time (UTCTime)
+import           Data.Time.Clock.POSIX (getPOSIXTime)
 import           Database.Persist.Sql (SqlBackend)
 import           Debug.Trace (traceShow)
 import           Import
 import           Model.IsaacVersion
+import           Network.AWS
+import           Network.AWS.S3
+import           System.Environment (lookupEnv)
 
 k :: Double
 k = 24.0
@@ -44,8 +54,7 @@ traceShowId :: Show b => b -> b
 traceShowId a = traceShow a a
 
 reprocessVotes ::
-  (Functor m, MonadIO m) =>
-  ReaderT SqlBackend m (M.Map (Key Item) Item, [Vote])
+  (MonadIO m) => ReaderT SqlBackend m (M.Map (Key Item) Item, [Vote])
 reprocessVotes = do
   updateWhere [] [ItemRating =. 500.1, ItemVotes =. 0]
   items <- M.fromList . map (\(Entity a b) -> (a, b)) <$> selectList [] []
@@ -62,3 +71,41 @@ serializeVotes items votes = _Array._Wrapped # map asJson votes
                       , ("loser", items^?!ix (vote^.voteLoser).itemIsaacId.re _JSON)
                       , ("timestamp", vote^.voteTimestamp.re _JSON)
                       ]
+
+gzJson :: ToJSON a => a -> LBS.ByteString
+gzJson = compressWith defaultCompressParams { compressLevel = bestCompression }
+         . encode
+
+staticEnv :: IO Network.AWS.Env
+staticEnv = newEnv NorthVirginia (FromEnv "ISAACRANKS_AWS_ACCESS_KEY_ID" "ISAACRANKS_AWS_SECRET_ACCESS_KEY" Nothing)
+
+staticConfig :: IO (Text, Text)
+staticConfig = do
+  e <- T.pack
+      <$> fromMaybe "testing"
+      <$> lookupEnv "YESOD_ENVIRONMENT"
+  b <- T.pack
+      <$> fromMaybe "static.isaacranks.com"
+      <$> lookupEnv "ISAACRANKS_STATIC_BUCKET_NAME"
+  return (e, b)
+
+uploadDump :: Value -> IO (Text, Text)
+uploadDump votes = do
+  (envName, bucketName) <- staticConfig
+  timestamp <- truncate <$> getPOSIXTime
+  let name = "data/" <> envName <> "/votes/" <> T.pack (show (timestamp :: Integer)) <> ".json"
+  e <- staticEnv
+  let m = [ ("Content-Type", "application/json")
+          , ("Content-Encoding", "gzip")
+          , ("Cache-Control", "max-age=2147483647")
+          ]
+  _ <- runResourceT . runAWS e . send $
+      putObject (BucketName bucketName) (ObjectKey name) (toBody votes)
+      & poMetadata._Wrapped .~ m
+  TI.putStrLn $ "Uploaded votes to " <> bucketName <> "/" <> name
+  return (bucketName, name)
+
+storeDump :: Text -> Text -> UTCTime -> (MonadIO m) => ReaderT SqlBackend m ()
+storeDump bucketName name timestamp = do
+  _ <- insert $ Dump bucketName name timestamp
+  return ()

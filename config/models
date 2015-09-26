@@ -31,3 +31,8 @@ Vote json
     rawBallot Text Maybe
     UniqueBallot rawBallot !force
     fancy Bool Maybe
+
+Dump
+    bucket Text
+    path Text
+    timestamp UTCTime

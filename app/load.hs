@@ -1,7 +1,7 @@
 module Main where
 
 import           Application (makeFoundation)
-import           Control.Monad.Logger (runLoggingT, runStdoutLoggingT)
+import           Control.Monad.Logger (runStdoutLoggingT, filterLogger)
 import qualified Database.Persist
 import           Database.Persist.Postgresql (createPostgresqlPool, pgConnStr, pgPoolSize)
 import           Helpers.Heroku (herokuConf)
@@ -19,6 +19,6 @@ main = do
                 Database.Persist.loadConfig >>=
                 Database.Persist.applyEnv
            else herokuConf
-  pool <- runStdoutLoggingT
+  pool <- runStdoutLoggingT . filterLogger (\_ LevelDebug -> False)
          $ createPostgresqlPool (pgConnStr dbconf) (pgPoolSize dbconf)
   runStdoutLoggingT $ Database.Persist.runPool dbconf (loadData version dataFile) pool

@@ -7,7 +7,6 @@ import           Control.Monad.Trans.Reader (ReaderT)
 import           Data.Default (def)
 import           Data.Text.Lens (_Text)
 import           Database.Persist.Sql (SqlBackend)
-import           Filesystem.Path.CurrentOS (decodeString)
 import           Import
 import           Model.IsaacPool
 import qualified Text.XML as XML
@@ -36,7 +35,7 @@ itemsFor name = root . el "ItemPools" ./ el "Pool" . attributeIs "Name" name ./ 
 loadData :: String -> FilePath -> ReaderT SqlBackend (LoggingT IO) ()
 loadData ver p = do
   let Just ver' = fromPathPiece (_Text # ver)
-  doc <- liftIO $ XML.readFile def (decodeString p)
+  doc <- liftIO $ XML.readFile def p
   updateWhere [] [ItemPools =. []]
   forM_ pools $ \(name, pool) -> do
     forMOf_ (itemsFor name) doc $ \e -> do

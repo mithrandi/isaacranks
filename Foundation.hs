@@ -1,6 +1,5 @@
 module Foundation where
 
-import           Control.Applicative ((<$>))
 import qualified Database.Persist
 import           Database.Persist.Sql (SqlBackend)
 import           Model

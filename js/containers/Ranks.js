@@ -32,7 +32,7 @@ export default class Ranks extends React.Component {
   render() {
     const ranks = this.props.ranks[this.props.params.version]
     if (ranks === undefined || ranks.loading || ranks.error) {
-      const message = ranks === undefined || ranks.loading ? 'Loading...' : ranks.error
+      const message = ranks === undefined || ranks.loading ? <i className="fa fa-refresh fa-spin" /> : ranks.error
       return (
         <div className="jumbotron">
           <h1>Item ranks</h1>
@@ -40,7 +40,7 @@ export default class Ranks extends React.Component {
         </div>
       )
     }
-    const {items, votesCast, meanVotes, minRating, maxRating} = ranks
+    const {items, votesCast, meanVotes, minRating, maxRating, latestDump} = ranks
     const {actions} = this.props
     return (
       <div>
@@ -48,6 +48,7 @@ export default class Ranks extends React.Component {
           <h1>Item ranks</h1>
           <p>{votesCast} votes total, mean of {meanVotes.toFixed(2)} per item.</p>
           <p>Normalized rating is normalized to range [0, 1000].</p>
+          <p><a href={latestDump}>Latest vote dump (JSON format)</a></p>
         </div>
         <Filters pools={this.props.pools} onToggle={actions.togglePool} onAll={actions.allPools} onNone={actions.noPools} />
         <RanksTable items={items} minRating={minRating} maxRating={maxRating} pools={this.props.pools} />
