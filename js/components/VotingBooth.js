@@ -21,33 +21,28 @@ export default class VotingBooth extends React.Component {
                               transitionEnterTimeout={150}
                               transitionLeave={false}
                               component="div">
-            <VotingItemPanel key={left.get('ballot')} ballot={left} />
+            <VotingItemPanel key={left.get('ballot')}
+                             ballot={left}
+                             hotkeyName="Left"
+                             hotkeyIcon="caret-square-o-left" />
           </CSSTransitionGroup>
           <VotingPanel bsStyle="info"
                        title="?"
                        label="Reroll!"
-                       onVote={onReroll}>
+                       onVote={onReroll}
+                       hotkeyName="Up"
+                       hotkeyIcon="caret-square-o-up">
             I don't know / can't decide
           </VotingPanel>
           <CSSTransitionGroup transitionName="voting"
                               transitionEnterTimeout={150}
                               transitionLeave={false}
                               component="div">
-            <VotingItemPanel key={right.get('ballot')} ballot={right} />
+            <VotingItemPanel key={right.get('ballot')}
+                             ballot={right}
+                             hotkeyName="Right"
+                             hotkeyIcon="caret-square-o-right" />
           </CSSTransitionGroup>
-        </Row>
-        <Row>
-          <Col md={4}>
-            <h2>Keyboard bindings:</h2>
-            <dl className="dl-horizontal">
-              <dt>Left</dt>
-              <dd>Vote for the item on the left.</dd>
-              <dt>Up</dt>
-              <dd>Reroll!</dd>
-              <dt>Right</dt>
-              <dd>Vote for the item on the right</dd>
-            </dl>
-          </Col>
         </Row>
       </div>
       )

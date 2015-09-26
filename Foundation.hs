@@ -79,6 +79,7 @@ instance Yesod App where
             addStylesheetRemote "http://static.isaacranks.com/styles/bootstrap-3.3.5"
             addStylesheetRemote "http://static.isaacranks.com/styles/bootstrap-theme-3.3.5"
             addStylesheetRemote "http://static.isaacranks.com/styles/icons-2"
+            addStylesheetRemote "http://static.isaacranks.com/fa-4.4.0/styles/font-awesome"
             addStylesheet $ StaticR css_isaacranks_css
             $(widgetFile "default-layout")
         withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")

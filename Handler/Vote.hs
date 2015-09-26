@@ -38,10 +38,6 @@ getVoteR ver = do
                    ]
   selectRep $ do
     provideRep . defaultLayout $ do
-      addScriptRemote "http://static.isaacranks.com/scripts/es5-shim-4.1.10"
-      addScriptRemote "http://static.isaacranks.com/scripts/es5-sham-4.1.10"
-      addScriptRemote "http://static.isaacranks.com/scripts/react-with-addons-0.13.3"
-      addStylesheetRemote "http://static.isaacranks.com/styles/font-awesome-4.2.0"
       setTitle "Isaac item ranks"
       addScript (StaticR js_bundle_js)
       $(widgetFile "vote")
