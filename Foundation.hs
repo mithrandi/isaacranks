@@ -138,10 +138,7 @@ instance YesodAuth App where
         case x of
             Just (Entity uid _) -> return $ Just uid
             Nothing ->
-              Just <$> insert User
-              { userIdent = credsIdent creds
-              , userPassword = Nothing
-              }
+              Just <$> insert (User (credsIdent creds) Nothing)
 
     -- You can add other plugins like BrowserID, email or OAuth here
     authPlugins _ = [authBrowserId def]

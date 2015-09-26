@@ -1,5 +1,6 @@
 module Handler.Vote where
 
+import           Control.Lens hiding ((.=))
 import           Data.Aeson (encode)
 import           Data.Binary.Get (runGet, getWord32be)
 import           Data.Binary.Put (runPut, putWord32be)
@@ -8,6 +9,7 @@ import qualified Data.ByteString.Char8 as BC
 import           Data.ByteString.Lazy (toStrict, fromStrict)
 import           Data.List (genericLength)
 import           Data.List (last)
+import           Data.Maybe
 import qualified Data.Text as T
 import           Data.Text.Encoding (decodeUtf8)
 import           Data.Time (getCurrentTime)
@@ -28,8 +30,8 @@ getVoteR ver = do
   gen <- lift newStdGen
   let (Entity _ left):(Entity _ right):_ = shuffle' items (length items) gen
   alreadyExpired
-  ballotLeft <- encryptBallot (itemIsaacId left) (itemIsaacId right)
-  ballotRight <- encryptBallot (itemIsaacId right) (itemIsaacId left)
+  ballotLeft <- encryptBallot (left^.itemIsaacId) (right^.itemIsaacId)
+  ballotRight <- encryptBallot (right^.itemIsaacId) (left^.itemIsaacId)
   let ballotJson = object
                    [ "left" .= left
                    , "ballotLeft" .= ballotLeft
@@ -94,8 +96,8 @@ getRanksR ver = do
       totalItems = genericLength items
       meanVotes :: Double
       meanVotes = fromIntegral (votesCast * 2) / totalItems
-      minRating = minimum . map itemRating $ items'
-      maxRating = maximum . map itemRating $ items'
+      minRating = fromMaybe 0 (minimumOf (traverse.itemRating) items')
+      maxRating = fromMaybe 0 (maximumOf (traverse.itemRating) items')
   selectRep $ do
     provideRep . defaultLayout $ do
       setTitle "Isaac item ranks"

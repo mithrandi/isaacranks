@@ -43,4 +43,4 @@ loadData ver p = do
       let isaacId :: Int
           isaacId = e ^?! attr "Id" . _Text . _Show
       Just (Entity k item) <- getBy $ UniqueItem ver' isaacId
-      replace k $ item { itemPools = pool:(itemPools item) }
+      replace k (item & itemPools %~ (pool:))

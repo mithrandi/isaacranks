@@ -95,6 +95,7 @@ library
                  , xml-lens
                  , lens
                  , system-filepath
+                 , lens-aeson                    >= 1.0        && <= 1.1
 
     -- see https://github.com/yesodweb/yesod/issues/814
     if !os(windows)
