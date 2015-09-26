@@ -21,7 +21,7 @@ export default class App extends React.Component {
               <NavItem>Ranks (Rebirth)</NavItem>
             </LinkContainer>
             <NavItem href="/donate">Donate</NavItem>
-            <NavItem href="/changes">Changes</NavItem>
+            <NavItem href="/changes">News</NavItem>
           </Nav>
         </Navbar>
         <div className="container">
