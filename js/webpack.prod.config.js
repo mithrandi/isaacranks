@@ -19,8 +19,11 @@ module.exports =
     })
   , new webpack.optimize.DedupePlugin()
   , new webpack.optimize.UglifyJsPlugin(
-      { compress: { warnings: false }
+    { compress:
+      { warnings: false
+      , dead_code: true }
       })
+  , new webpack.optimize.OccurenceOrderPlugin()
   ]
 , module:
   { loaders:
