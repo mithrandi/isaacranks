@@ -93,13 +93,15 @@ uploadDump :: Value -> IO (Text, Text)
 uploadDump votes = do
   (envName, bucketName) <- staticConfig
   timestamp <- truncate <$> getPOSIXTime
-  let name = "data/" <> envName <> "/votes/" <> T.pack (show (timestamp :: Integer)) <> ".json"
-  let gzBody = toBody (gzJson votes)
+  let filename = T.pack (show (timestamp :: Integer)) <> ".json"
+      name = "data/" <> envName <> "/votes/" <> filename
+      gzBody = toBody (gzJson votes)
   e <- staticEnv
   _ <- runResourceT . runAWS e . send $
       putObject (BucketName bucketName) (ObjectKey name) gzBody
       & poContentType ?~ "application/json"
       & poContentEncoding ?~ "gzip"
+      & poContentDisposition ?~ "attachment; filename=" <> filename
       & poCacheControl ?~ "max-age=2147483647"
   TI.putStrLn $ "Uploaded votes to " <> bucketName <> "/" <> name
   return (bucketName, name)
