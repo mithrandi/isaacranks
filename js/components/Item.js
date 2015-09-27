@@ -1,4 +1,5 @@
 import React, {PropTypes as P} from 'react'
+import ItemIcon from './ItemIcon'
 
 export default class Item extends React.Component {
   static propTypes =
@@ -12,8 +13,8 @@ export default class Item extends React.Component {
     return (
       <tr>
         <td>{index + 1}</td>
-        <td>{item.isaacId}</td>
-        <td>{item.name}</td>
+        <td><ItemIcon isaacId={item.isaacId} href={item.wiki} title={item.name} /></td>
+        <td><a href={item.wiki}>{item.name}</a></td>
         <td>"{item.description}"</td>
         <td>{item.rating.toFixed(2)}</td>
         <td>{norm.toFixed(2)}</td>

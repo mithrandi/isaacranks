@@ -1,7 +1,7 @@
 import React, {PropTypes as P} from 'react'
 import IP from 'react-immutable-proptypes'
 import VotingPanel from './VotingPanel'
-import zfill from 'zero-fill'
+import ItemIcon from './ItemIcon'
 
 export default class VotingItemPanel extends React.Component {
   static propTypes =
@@ -18,8 +18,6 @@ export default class VotingItemPanel extends React.Component {
           <i className="fa fa-refresh fa-spin" />
         </VotingPanel>
         )
-    const itemId = zfill(3, ballot.get('isaacId'))
-    const className = `center-block icons icons-collectibles_${itemId}`
     return (
       <VotingPanel bsStyle="primary"
                    href={ballot.get('wiki')}
@@ -28,7 +26,7 @@ export default class VotingItemPanel extends React.Component {
                    onVote={ballot.get('onVote')}
                    hotkeyName={this.props.hotkeyName}
                    hotkeyIcon={this.props.hotkeyIcon}>
-        <a className={className} href={ballot.get('wiki')} />
+        <ItemIcon isaacId={ballot.get('isaacId')} href={ballot.get('wiki')} title={ballot.get('name')} />
         "{ballot.get('description')}"
       </VotingPanel>
       )

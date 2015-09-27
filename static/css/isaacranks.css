@@ -12,3 +12,8 @@ body { padding-top: 70px; }
 div {
     outline: none;
 }
+
+table.ranks-table > tbody > tr > td {
+    line-height: 64px;
+    vertical-align: middle;
+}

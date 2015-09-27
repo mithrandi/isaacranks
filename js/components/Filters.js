@@ -23,8 +23,8 @@ export default class Filters extends React.Component {
           {buttons}
         </ButtonGroup>
         <ButtonGroup>
-          <Button onClick={onAll}>All</Button>
-          <Button onClick={onNone}>None</Button>
+          <Button bsSize="small" onClick={onAll}>All</Button>
+          <Button bsSize="small" onClick={onNone}>None</Button>
         </ButtonGroup>
       </ButtonToolbar>
     )

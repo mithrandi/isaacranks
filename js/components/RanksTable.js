@@ -1,6 +1,7 @@
 import React, {PropTypes as P} from 'react'
 import {Set} from 'immutable'
 import IP from 'react-immutable-proptypes'
+import {Table} from 'react-bootstrap'
 import Item from './Item'
 
 export default class RanksTable extends React.Component {
@@ -21,11 +22,11 @@ export default class RanksTable extends React.Component {
     })
     return (
       <div className="table-responsive">
-        <table className="table table-condensed table-hover">
+        <table className="table table-condensed table-hover ranks-table">
           <thead>
             <tr>
               <th>#</th>
-              <th>Item ID</th>
+              <th />
               <th>Name</th>
               <th>Description</th>
               <th>Rating</th>

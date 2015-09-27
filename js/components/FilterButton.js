@@ -12,7 +12,7 @@ export default class FilterButton extends React.Component {
 
   render() {
     const {name, pools, label, onToggle} = this.props
-    const bsStyle = pools.has(name) ? 'success' : 'danger'
-    return <Button bsStyle={bsStyle} onClick={() => onToggle(name)}>{label}</Button>
+    const active = pools.has(name) ? true : false
+    return <Button bsSize="small" active={active} onClick={() => onToggle(name)}>{label}</Button>
   }
 }
