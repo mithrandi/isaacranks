@@ -61,8 +61,8 @@ export default class Ranks extends React.Component {
           <p>Normalized rating is normalized to range [0, 1000].</p>
           <p><a href={latestDump} title="WARNING: large file!">Latest vote dump (JSON format)</a></p>
         </Jumbotron>
-        <Filters pools={this.props.ranks.pools} onToggle={actions.togglePool} onAll={actions.allPools} onNone={actions.noPools} />
-        <RanksTable items={items} minRating={minRating} maxRating={maxRating} pools={this.props.ranks.pools} />
+        <Filters filters={this.props.ranks.filters} onToggle={actions.toggleFilter} onAll={actions.allFilters} onNone={actions.noFilters} />
+        <RanksTable items={items} minRating={minRating} maxRating={maxRating} filters={this.props.ranks.filters} />
       </div>
       )
   }

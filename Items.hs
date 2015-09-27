@@ -70,3 +70,4 @@ loadData ver itemsPath poolsPath = do
           isaacId = e ^?! attr "Id" . _Text . _Show
       Just (Entity k item) <- getBy $ UniqueItem ver' isaacId
       replace k (item & itemPools %~ (pool:))
+  updateWhere [ItemPools ==. []] [ItemPools =. [PoolMISC]]

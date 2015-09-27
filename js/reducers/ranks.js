@@ -1,13 +1,19 @@
-import * as A from '../constants/ActionTypes'
 import {Map, Record, List, Set, fromJS} from 'immutable'
-import pools from '../constants/pools'
+import * as A from '../constants/ActionTypes'
+import filters from '../constants/filters'
 
-const allPools = pools.map(([name, desc]) => name).toSet()
+
+const allFilters = filters.map(
+  values => values.map(([name, desc]) => name).toSet())
+const noFilters = filters.map(
+  values => Set())
+
 
 export const RanksState = Record(
   { ranks: Map()
-  , pools: allPools
+  , filters: allFilters
   })
+
 
 const RanksR = Record(
   { items: List()
@@ -17,6 +23,7 @@ const RanksR = Record(
   , maxRating: 0
   , latestDump: null
   })
+
 
 export default function ranks(state = new RanksState(), action) {
   switch (action.type) {
@@ -28,14 +35,14 @@ export default function ranks(state = new RanksState(), action) {
       return state.setIn(['ranks', action.version], fromJS({error: action.error.toString()}))
     case A.LOAD_RANKS_RESET:
       return state.deleteIn(['ranks', action.version])
-    case A.TOGGLE_POOL:
+    case A.TOGGLE_FILTER:
       return state.updateIn(
-        ['pools', action.version],
-        pools => pools.has(action.name) ? pools.remove(action.name) : pools.add(action.name))
-    case A.POOLS_ALL:
-      return state.set('pools', allPools)
-    case A.POOLS_NONE:
-      return state.set('pools', Set())
+        ['filters', action.filterType],
+        filters => filters.has(action.name) ? filters.remove(action.name) : filters.add(action.name))
+    case A.FILTERS_ALL:
+      return state.set('filters', allFilters)
+    case A.FILTERS_NONE:
+      return state.set('filters', noFilters)
   }
   return state
 }

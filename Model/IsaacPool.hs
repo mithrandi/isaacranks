@@ -17,6 +17,7 @@ data IsaacPool = PoolItemRoom
                | PoolBeggar
                | PoolDemonBeggar
                | PoolKeyBeggar
+               | PoolMISC
                deriving (Show, Read, Eq, Ord)
 
 derivePersistField "IsaacPool"
