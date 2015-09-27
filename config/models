@@ -14,7 +14,7 @@ Item json
     isaacId Int
     name Text
     description Text
-    imageId Text default='000'
+    imageId Text default='000' SafeToRemove
     wiki Text default=''
     rating Double
     votes Int
