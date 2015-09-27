@@ -48,7 +48,7 @@ export default class Ranks extends React.Component {
           <h1>Item ranks</h1>
           <p>{votesCast} votes total, mean of {meanVotes.toFixed(2)} per item.</p>
           <p>Normalized rating is normalized to range [0, 1000].</p>
-          <p><a href={latestDump}>Latest vote dump (JSON format)</a></p>
+          <p><a href={latestDump} title="WARNING: large file!">Latest vote dump (JSON format)</a></p>
         </div>
         <Filters pools={this.props.pools} onToggle={actions.togglePool} onAll={actions.allPools} onNone={actions.noPools} />
         <RanksTable items={items} minRating={minRating} maxRating={maxRating} pools={this.props.pools} />
