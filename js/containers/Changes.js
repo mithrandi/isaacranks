@@ -1,9 +1,10 @@
 import React, {PropTypes as P} from 'react'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
-import {Jumbotron, Alert, Button, Panel} from 'react-bootstrap'
+import {Jumbotron, Panel} from 'react-bootstrap'
 import {Changes as ChangesRecord} from '../reducers/changes'
 import * as ChangesActions from '../actions/Changes'
+import ErrorAlert from '../components/ErrorAlert'
 
 function mapStateToProps(state) {
   return {'changes': state.changes}
@@ -34,15 +35,9 @@ export default class Changes extends React.Component {
       )
     var content = null
     if (loading) {
-      content = (<div><i className="fa fa-refresh fa-spin" /></div>)
+      content = <div><i className="fa fa-refresh fa-spin" /></div>
     } else if (error) {
-      content = (
-        <Alert bsStyle="danger">
-          <h2>Unable to load changelog:</h2>
-          <p>{error.toString()}</p>
-          <p><Button bsStyle="danger" onClick={actions.loadChanges}>Retry</Button></p>
-        </Alert>
-        )
+      content = <ErrorAlert title="Unable to load changelog:" error={error} onReset={actions.loadChanges} />
     } else if (changes) {
       const changelog = changes.map(entry =>
         [ <dt>{entry.get(0)}</dt>

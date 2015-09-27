@@ -1,12 +1,15 @@
 import React, {PropTypes as P} from 'react'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
+import {Jumbotron} from 'react-bootstrap'
 import Filters from '../components/Filters'
 import RanksTable from '../components/RanksTable'
+import ErrorAlert from '../components/ErrorAlert'
 import * as RanksActions from '../actions/Ranks'
+import {RanksState} from '../reducers/ranks'
 
 function mapStateToProps(state) {
-  return state.ranks
+  return {ranks: state.ranks}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -17,7 +20,7 @@ function mapDispatchToProps(dispatch) {
 export default class Ranks extends React.Component {
   static propTypes =
   { actions: P.objectOf(P.func).isRequired
-  , ranks: P.object
+  , ranks: P.instanceOf(RanksState).isRequired
   }
 
   componentDidMount() {
@@ -29,28 +32,37 @@ export default class Ranks extends React.Component {
   }
 
   render() {
-    const ranks = this.props.ranks[this.props.params.version]
-    if (ranks === undefined || ranks.loading || ranks.error) {
-      const message = ranks === undefined || ranks.loading ? <i className="fa fa-refresh fa-spin" /> : ranks.error
+    const {actions} = this.props
+    const {version} = this.props.params
+    const ranks = this.props.ranks.ranks.get(version)
+    if (ranks === undefined || ranks.get('loading')) {
       return (
-        <div className="jumbotron">
+        <Jumbotron>
           <h1>Item ranks</h1>
-          <p>{message}</p>
-        </div>
+          <p><i className="fa fa-refresh fa-spin" /></p>
+        </Jumbotron>
       )
+    } else if (ranks.get('error')) {
+      return (
+        <div>
+          <Jumbotron>
+            <h1>Item ranks</h1>
+          </Jumbotron>
+          <ErrorAlert title="Unable to fetch ranks:" error={ranks.get('error')} onReset={() => actions.resetRanks(version)} />
+        </div>
+        )
     }
     const {items, votesCast, meanVotes, minRating, maxRating, latestDump} = ranks
-    const {actions} = this.props
     return (
       <div>
-        <div className="jumbotron">
+        <Jumbotron>
           <h1>Item ranks</h1>
           <p>{votesCast} votes total, mean of {meanVotes.toFixed(2)} per item.</p>
           <p>Normalized rating is normalized to range [0, 1000].</p>
           <p><a href={latestDump} title="WARNING: large file!">Latest vote dump (JSON format)</a></p>
-        </div>
-        <Filters pools={this.props.pools} onToggle={actions.togglePool} onAll={actions.allPools} onNone={actions.noPools} />
-        <RanksTable items={items} minRating={minRating} maxRating={maxRating} pools={this.props.pools} />
+        </Jumbotron>
+        <Filters pools={this.props.ranks.pools} onToggle={actions.togglePool} onAll={actions.allPools} onNone={actions.noPools} />
+        <RanksTable items={items} minRating={minRating} maxRating={maxRating} pools={this.props.ranks.pools} />
       </div>
       )
   }

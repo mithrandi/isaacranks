@@ -1,46 +1,41 @@
 import * as A from '../constants/ActionTypes'
-import {Set} from 'immutable'
-import poolNames from '../constants/pools'
+import {Map, Record, List, Set, fromJS} from 'immutable'
+import pools from '../constants/pools'
 
-const initialState = (
-  { ranks: {}
-  , pools: Set(poolNames.map(([name, desc]) => name))
+const allPools = pools.map(([name, desc]) => name).toSet()
+
+export const RanksState = Record(
+  { ranks: Map()
+  , pools: allPools
   })
 
-export default function ranks(state = initialState, action) {
+const RanksR = Record(
+  { items: List()
+  , votesCast: 0
+  , meanVotes: 0
+  , minRating: 0
+  , maxRating: 0
+  , latestDump: null
+  })
+
+export default function ranks(state = new RanksState(), action) {
   switch (action.type) {
     case A.LOAD_RANKS_LOADING:
-      return Object.assign(
-        {}, state,
-        { ranks: Object.assign(
-          {}, state.ranks, {[action.version]: {loading: true}})
-        })
+      return state.setIn(['ranks', action.version], fromJS({loading: true}))
     case A.LOAD_RANKS_SUCCESS:
-      return Object.assign(
-        {}, state,
-        { ranks: Object.assign(
-          {}, state.ranks, {[action.version]: action.data})
-        })
+      return state.setIn(['ranks', action.version], new RanksR(action.data))
     case A.LOAD_RANKS_FAILURE:
-      return Object.assign(
-        {}, state,
-        { ranks: Object.assign(
-          {}, state.ranks, {[action.version]: {error: action.error.toString()}})
-        })
+      return state.setIn(['ranks', action.version], fromJS({error: action.error.toString()}))
+    case A.LOAD_RANKS_RESET:
+      return state.deleteIn(['ranks', action.version])
     case A.TOGGLE_POOL:
-      const pools = state.pools
-      if (pools.has(action.name))
-        return Object.assign(
-          {}, state, { pools: pools.remove(action.name) })
-      return Object.assign(
-        {}, state, { pools: pools.add(action.name) })
+      return state.updateIn(
+        ['pools', action.version],
+        pools => pools.has(action.name) ? pools.remove(action.name) : pools.add(action.name))
     case A.POOLS_ALL:
-      return Object.assign(
-        {}, state,
-        { pools: Set(poolNames.map(([name, desc]) => name)) })
+      return state.set('pools', allPools)
     case A.POOLS_NONE:
-      return Object.assign(
-        {}, state, { pools: Set() })
+      return state.set('pools', Set())
   }
   return state
 }

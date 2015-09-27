@@ -6,7 +6,7 @@ import {Map} from 'immutable'
 import {HotKeys} from 'react-hotkeys'
 import * as VoteActions from '../actions/Vote'
 import VotingBooth from '../components/VotingBooth'
-import ErrorPage from '../components/ErrorPage'
+import ErrorAlert from '../components/ErrorAlert'
 
 function keyPressOnce(component, name, handler) {
   const down = (event) => {
@@ -52,9 +52,20 @@ export default class Vote extends React.Component {
 
   render() {
     const {actions, voting} = this.props
+    const header = (
+        <div className="jumbotron">
+          <h1>Rank items</h1>
+          <p>Please select the item you would prefer below:</p>
+        </div>
+      )
     const error = voting.get('error')
     if (error) {
-      return (<ErrorPage onReset={actions.reset}>{error}</ErrorPage>)
+      return (
+        <div>
+          {header}
+          <ErrorAlert title="Oops! Something went wrong:" error={error} onReset={actions.reset} />
+        </div>
+        )
     }
 
     const {version} = this.props.params
@@ -89,10 +100,7 @@ export default class Vote extends React.Component {
 
     return (
       <HotKeys keyMap={keyMap} handlers={handlers} focused={true} attach={window}>
-        <div className="jumbotron">
-          <h1>Rank items</h1>
-          <p>Please select the item you would prefer below:</p>
-        </div>
+        {header}
         <VotingBooth left={left} right={right} onReroll={onReroll} />
       </HotKeys>
       )

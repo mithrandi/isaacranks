@@ -1,6 +1,7 @@
 export const LOAD_RANKS_LOADING = Symbol('LOAD_RANKS_LOADING')
 export const LOAD_RANKS_SUCCESS = Symbol('LOAD_RANKS_SUCCESS')
 export const LOAD_RANKS_FAILURE = Symbol('LOAD_RANKS_FAILURE')
+export const LOAD_RANKS_RESET = Symbol('LOAD_RANKS_RESET')
 
 export const TOGGLE_POOL = Symbol('TOGGLE_POOL')
 export const POOLS_ALL = Symbol('POOLS_ALL')

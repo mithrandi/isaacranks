@@ -3,8 +3,7 @@ import {FETCH_DATA} from '../middleware/fetch'
 
 export function loadRanks(version) {
   return (dispatch, getState) => {
-    const state = getState()
-    if (state.ranks.ranks[version] !== undefined)
+    if (getState().ranks.hasIn(['ranks', version]))
       return null
     return dispatch(
       { [FETCH_DATA]:
@@ -17,6 +16,12 @@ export function loadRanks(version) {
       , version: version
       })
   }
+}
+
+export function resetRanks(version) {
+  return { type: A.LOAD_RANKS_RESET
+         , version: version
+         }
 }
 
 export function togglePool(name) {

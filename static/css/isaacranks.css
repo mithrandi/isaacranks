@@ -14,6 +14,9 @@ div {
 }
 
 table.ranks-table > tbody > tr > td {
-    line-height: 64px;
     vertical-align: middle;
+}
+
+table.ranks-table a.icon {
+    -webkit-scale: 0.75;
 }

@@ -1,4 +1,6 @@
-const poolNames =
+import {fromJS} from 'immutable'
+
+export default fromJS(
   [ ['ItemRoom', 'Item']
   , ['Shop', 'Shop']
   , ['BossRoom', 'Boss']
@@ -12,6 +14,4 @@ const poolNames =
   , ['Beggar', 'Beggar']
   , ['DemonBeggar', 'Demon Beggar']
   , ['KeyBeggar', 'Key Beggar']
-  ]
-
-export default poolNames
+  ])
