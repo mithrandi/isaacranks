@@ -37,6 +37,7 @@ import           Yesod.Default.Main
 -- Don't forget to add new modules to your cabal file!
 import           Handler.Home
 import           Handler.Vote
+import           Handler.Ranks
 import           Handler.Donate
 
 -- This line actually creates our YesodDispatch instance. It is the second half

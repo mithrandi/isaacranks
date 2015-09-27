@@ -7,7 +7,6 @@ import           Data.Binary.Put (runPut, putWord32be)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 import           Data.ByteString.Lazy (toStrict, fromStrict)
-import           Data.List (genericLength)
 import           Data.List (last)
 import           Data.Maybe
 import qualified Data.Text as T
@@ -84,32 +83,3 @@ postVoteR ver = do
   timestamp <- lift getCurrentTime
   _ <- runDB (processVote ver winner loser timestamp voter ballot fancy)
   getVoteR ver
-
-getRanksR :: IsaacVersion -> Handler TypedContent
-getRanksR ver = do
-  let ranks :: [Integer]
-      ranks = [1..]
-  (items, votesCast, dump) <- runDB $ (,,)
-    <$> ((ranks `zip`) <$> selectList [ItemVersion ==. ver] [Desc ItemRating])
-    <*> count ([] :: [Filter Vote])
-    <*> selectFirst [] [Desc DumpTimestamp]
-  let items' = map (entityVal . snd) items
-      totalItems = genericLength items
-      meanVotes :: Double
-      meanVotes = fromIntegral (votesCast * 2) / totalItems
-      minRating = fromMaybe 0 (minimumOf (traverse.itemRating) items')
-      maxRating = fromMaybe 0 (maximumOf (traverse.itemRating) items')
-      latestDump = dump ^? _Just . to entityVal . dumpPath . to ("http://static.isaacranks.com/" <>)
-  selectRep $ do
-    provideRep . defaultLayout $ do
-      setTitle "Isaac item ranks"
-      addScript (StaticR js_bundle_js)
-      $(widgetFile "ranks")
-    provideJson $ object
-      [ "items" .= items'
-      , "votesCast" .= votesCast
-      , "meanVotes" .= meanVotes
-      , "minRating" .= minRating
-      , "maxRating" .= maxRating
-      , "latestDump" .= latestDump
-      ]

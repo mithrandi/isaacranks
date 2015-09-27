@@ -25,6 +25,7 @@ library
                      Settings.Development
                      Handler.Home
                      Handler.Vote
+                     Handler.Ranks
                      Handler.Donate
                      Vote
     other-modules: Paths_isaacranks
