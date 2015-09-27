@@ -7,7 +7,7 @@ const initialState = (
   , pools: Set(poolNames.map(([name, desc]) => name))
   })
 
-export default function ranks(state = initialState, action){
+export default function ranks(state = initialState, action) {
   switch (action.type) {
     case A.LOAD_RANKS_LOADING:
       return Object.assign(

@@ -5,7 +5,6 @@ import Filters from '../components/Filters'
 import RanksTable from '../components/RanksTable'
 import * as RanksActions from '../actions/Ranks'
 
-
 function mapStateToProps(state) {
   return state.ranks
 }

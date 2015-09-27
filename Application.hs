@@ -39,6 +39,7 @@ import           Handler.Home
 import           Handler.Vote
 import           Handler.Ranks
 import           Handler.Donate
+import           Handler.Changes
 
 -- This line actually creates our YesodDispatch instance. It is the second half
 -- of the call to mkYesodData which occurs in Foundation.hs. Please see the
@@ -90,7 +91,7 @@ makeFoundation conf = do
     (getter, _) <- clockDateCacher
 
     key <- do
-        Right key64 <- (B64.decode . BC.pack <$> getEnv "BALLOT_MASKING_KEY")
+        Right key64 <- B64.decode . BC.pack <$> getEnv "BALLOT_MASKING_KEY"
         let Right key = WS.initKey key64
         return key
 

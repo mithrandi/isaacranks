@@ -11,3 +11,7 @@ export const REROLL_BALLOT = Symbol('REROLL_BALLOT')
 export const LOAD_BALLOT = Symbol('LOAD_BALLOT')
 export const LOAD_BALLOT_FAILURE = Symbol('LOAD_BALLOT_FAILURE')
 export const RESET_BALLOT = Symbol('RESET_BALLOT')
+
+export const LOAD_CHANGES_LOADING = Symbol('LOAD_CHANGES_LOADING')
+export const LOAD_CHANGES_SUCCESS = Symbol('LOAD_CHANGES_SUCCESS')
+export const LOAD_CHANGES_FAILURE = Symbol('LOAD_CHANGES_FAILURE')

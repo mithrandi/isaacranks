@@ -27,6 +27,7 @@ library
                      Handler.Vote
                      Handler.Ranks
                      Handler.Donate
+                     Handler.Changes
                      Vote
     other-modules: Paths_isaacranks
 

@@ -23,7 +23,9 @@ export default class App extends React.Component {
             <LinkContainer to="/donate">
               <NavItem>Donate</NavItem>
             </LinkContainer>
-            <NavItem href="/changes">News</NavItem>
+            <LinkContainer to="/changes">
+              <NavItem>News</NavItem>
+            </LinkContainer>
           </Nav>
         </Navbar>
         <div className="container">

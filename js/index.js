@@ -8,6 +8,7 @@ import App from './containers/App'
 import Vote from './containers/Vote'
 import Ranks from './containers/Ranks'
 import Donate from './containers/Donate'
+import Changes from './containers/Changes'
 import configureStore from './store/configureStore'
 
 class Root extends React.Component {
@@ -19,6 +20,7 @@ class Root extends React.Component {
             <Route path=":version/vote" component={Vote} />
             <Route path=":version/ranks" component={Ranks} />
             <Route path="donate" component={Donate} />
+            <Route path="changes" component={Changes} />
           </Route>
         </ReduxRouter>
       </Provider>
