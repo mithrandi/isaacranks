@@ -53,6 +53,6 @@ export default class Ranks extends React.Component {
         <Filters pools={this.props.pools} onToggle={actions.togglePool} onAll={actions.allPools} onNone={actions.noPools} />
         <RanksTable items={items} minRating={minRating} maxRating={maxRating} pools={this.props.pools} />
       </div>
-    )
+      )
   }
 }

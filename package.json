@@ -35,6 +35,7 @@
     "redux": "^3.0.0",
     "redux-router": "^1.0.0-beta3",
     "redux-thunk": "^1.0.0",
+    "scriptjs": "^2.5.8",
     "webpack": "^1.12.1",
     "whatwg-fetch": "^0.9.0",
     "zero-fill": "^2.2.1"
