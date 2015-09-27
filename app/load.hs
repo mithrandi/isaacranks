@@ -1,6 +1,5 @@
 module Main where
 
-import           Application (makeFoundation)
 import           Control.Monad.Logger (runStdoutLoggingT, filterLogger)
 import qualified Database.Persist
 import           Database.Persist.Postgresql (createPostgresqlPool, pgConnStr, pgPoolSize)

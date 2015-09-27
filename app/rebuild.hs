@@ -1,15 +1,11 @@
 module Main where
 
-import           Application (makeFoundation)
-import           Control.Monad.Logger (runStdoutLoggingT, filterLogger, LogLevel(..))
-import           Control.Monad.Trans.Reader (ReaderT)
-import           Data.Maybe (fromMaybe)
+import           Control.Monad.Logger (runStdoutLoggingT, filterLogger)
 import           Data.Time (getCurrentTime)
 import qualified Database.Persist
 import           Database.Persist.Postgresql (createPostgresqlPool, pgConnStr, pgPoolSize)
-import           Database.Persist.Sql (SqlBackend)
 import           Helpers.Heroku (herokuConf)
-import           Import
+import           Import hiding (runDB)
 import           System.Environment (lookupEnv)
 import           Vote (reprocessVotes, serializeVotes, uploadDump, storeDump)
 import           Yesod.Default.Config
@@ -28,7 +24,7 @@ main = do
   (items, votes) <- runDB reprocessVotes
   bucket <- lookupEnv "ISAACRANKS_STATIC_BUCKET_NAME"
   case bucket of
-    Just b -> do
+    Just _ -> do
       (bucketName, name) <- uploadDump (serializeVotes items votes)
       timestamp <- getCurrentTime
       runDB $ storeDump bucketName name timestamp
