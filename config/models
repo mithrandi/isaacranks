@@ -19,6 +19,7 @@ Item json
     rating Double
     votes Int
     pools [IsaacPool] default='[]'
+    itype Text default='unknown'
     UniqueItem version isaacId
     deriving Show
 

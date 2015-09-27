@@ -11,7 +11,7 @@ import           Yesod.Default.Config
 
 main :: IO ()
 main = do
-  [version, dataFile] <- getArgs
+  [version, itemsFile, poolsFile] <- getArgs
   conf <- Yesod.Default.Config.loadConfig (configSettings Production) { csParseExtra = parseExtra }
   dbconf <- if development
            then withYamlEnvironment "config/postgresql.yml" (appEnv conf)
@@ -20,4 +20,5 @@ main = do
            else herokuConf
   pool <- runStdoutLoggingT . filterLogger (\_ LevelDebug -> False)
          $ createPostgresqlPool (pgConnStr dbconf) (pgPoolSize dbconf)
-  runStdoutLoggingT $ Database.Persist.runPool dbconf (loadData version dataFile) pool
+  runStdoutLoggingT $
+    Database.Persist.runPool dbconf (loadData version itemsFile poolsFile) pool

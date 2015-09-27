@@ -29,7 +29,7 @@ export default class VotingItemPanel extends React.Component {
                    hotkeyName={this.props.hotkeyName}
                    hotkeyIcon={this.props.hotkeyIcon}>
         <a className={className} href={ballot.get('wiki')} />
-        {ballot.get('description')}
+        "{ballot.get('description')}"
       </VotingPanel>
       )
   }

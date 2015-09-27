@@ -14,7 +14,7 @@ export default class Item extends React.Component {
         <td>{index + 1}</td>
         <td>{item.isaacId}</td>
         <td>{item.name}</td>
-        <td>{item.description}</td>
+        <td>"{item.description}"</td>
         <td>{item.rating.toFixed(2)}</td>
         <td>{norm.toFixed(2)}</td>
         <td>{item.votes}</td>
