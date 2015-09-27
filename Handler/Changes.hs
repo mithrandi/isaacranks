@@ -12,9 +12,10 @@ getChangesR = selectRep $ do
   where changes :: [(Text, [Text])]
         changes =
           [ ( "Unreleased"
-            , [ "Reworked the client-side code; a modern browser with JavaScript enabled is now required for all functionality, but the UI should be a lot more robust."
+            , [ "The \"It Lives!\" update!"
+              , "Reworked the client-side code; a modern browser with JavaScript enabled is now required for all functionality, but the UI should be a lot more robust."
               , "Dump the vote data on a periodic basis; see the ranks page for a link to the latest dump. Feel free to contact me if you'd like to do something with the vote data that isn't satisfied by this dump."
-              , "Added filtering by item pool to the ranks page."
+              , "Added filtering by item pool and type to the ranks page."
               , "Added item icons and wiki links to the ranks page."
               ]
             )
