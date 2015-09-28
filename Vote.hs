@@ -15,7 +15,6 @@ import qualified Data.Text.IO as TI
 import           Data.Time (UTCTime)
 import           Data.Time.Clock.POSIX (getPOSIXTime)
 import           Database.Persist.Sql (SqlBackend)
-import           Debug.Trace (traceShow)
 import           Import
 import           Model.IsaacVersion
 import           Network.AWS
@@ -49,9 +48,6 @@ applyVote items vote =
         lr = loser^.itemRating
         adjustRating a = M.adjust
                          (\i -> i & itemRating +~ a & itemVotes +~ 1)
-
-traceShowId :: Show b => b -> b
-traceShowId a = traceShow a a
 
 reprocessVotes ::
   (MonadIO m) => ReaderT SqlBackend m (M.Map (Key Item) Item, [Vote])
