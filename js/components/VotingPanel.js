@@ -6,8 +6,7 @@ const HotkeyOverlay = (props) => {
     const iconClass = `fa fa-lg fa-${props.icon}`
     const overlay = (
       <Tooltip id="keyboard-binding">
-        <i className="fa fa-lg fa-keyboard-o" aria-hidden={true} />
-        <span className="sr-only">Keyboard binding</span>: <i className={iconClass} aria-hidden={true} />
+        Keyboard binding: <i className={iconClass} aria-hidden={true} />
         <span className="sr-only">{props.name}</span>
       </Tooltip>)
     return (
