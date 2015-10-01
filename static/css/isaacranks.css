@@ -20,3 +20,7 @@ table.ranks-table > tbody > tr > td {
 table.ranks-table a.icon {
     -webkit-scale: 0.75;
 }
+
+.vote-dump {
+    font-size: 70%;
+}

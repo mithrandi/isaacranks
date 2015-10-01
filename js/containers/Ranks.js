@@ -59,7 +59,7 @@ export default class Ranks extends React.Component {
           <h1>Item ranks</h1>
           <p>{votesCast} votes total, mean of {meanVotes.toFixed(2)} per item.</p>
           <p>Normalized rating is normalized to range [0, 1000].</p>
-          <p><a href={latestDump} title="WARNING: large file!">Latest vote dump (JSON format)</a></p>
+          <p><a className="vote-dump" href={latestDump} title="WARNING: large file!">Latest vote dump (JSON format)</a></p>
         </Jumbotron>
         <Filters filters={this.props.ranks.filters} onToggle={actions.toggleFilter} onAll={actions.allFilters} onNone={actions.noFilters} />
         <RanksTable items={items} minRating={minRating} maxRating={maxRating} filters={this.props.ranks.filters} />
