@@ -1,11 +1,11 @@
 module Handler.Vote where
 
-import           Control.Lens hiding ((.=))
 import qualified Data.ByteString.Char8 as BC
 import           Data.List (last)
 import           Data.Maybe
 import qualified Data.Text as T
 import           Data.Time (getCurrentTime)
+import qualified Database.Esqueleto as E
 import           Import
 import           Model.IsaacVersion
 import           Network.Wai (requestHeaders, remoteHost)
@@ -15,13 +15,18 @@ import           Vote (processVote, encryptBallot, decryptBallot)
 
 getVoteR :: IsaacVersion -> Handler TypedContent
 getVoteR ver = do
-  items <- runDB $ selectList [ItemVersion ==. ver] []
+  items <- runDB $ E.select $ E.from $ \item -> do
+    E.where_ $ item E.^. ItemVersion E.==. E.val ver
+    return $ item E.^. ItemIsaacId
   gen <- lift newStdGen
-  let Entity _ left:Entity _ right:_ = shuffle' items (length items) gen
+  let E.Value leftId:E.Value rightId:_ = shuffle' items (length items) gen
+  (Just (Entity _ left), Just (Entity _ right)) <- runDB $
+                  (,) <$> getBy (UniqueItem ver leftId)
+                      <*> getBy (UniqueItem ver rightId)
   alreadyExpired
   timestamp <- lift getCurrentTime
-  ballotLeft <- encryptBallot timestamp (left^.itemIsaacId) (right^.itemIsaacId)
-  ballotRight <- encryptBallot timestamp (right^.itemIsaacId) (left^.itemIsaacId)
+  ballotLeft <- encryptBallot timestamp leftId rightId
+  ballotRight <- encryptBallot timestamp rightId leftId
   let ballotJson = object
                    [ "left" .= left
                    , "ballotLeft" .= ballotLeft
