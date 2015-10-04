@@ -15,15 +15,21 @@ library
     exposed-modules: Application
                      Foundation
                      Import
+                     Items
                      Model
+                     Model.IsaacVersion
+                     Model.IsaacPool
                      Helpers.Heroku
                      Settings
                      Settings.StaticFiles
                      Settings.Development
                      Handler.Home
                      Handler.Vote
+                     Handler.Ranks
                      Handler.Donate
+                     Handler.Changes
                      Vote
+    other-modules: Paths_isaacranks
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -40,6 +46,7 @@ library
                 TypeFamilies
                 GADTs
                 GeneralizedNewtypeDeriving
+                LambdaCase
                 FlexibleContexts
                 EmptyDataDecls
                 NoMonomorphismRestriction
@@ -47,17 +54,18 @@ library
                 ViewPatterns
                 TupleSections
                 FlexibleInstances
+                RankNTypes
 
     build-depends: base                          >= 4          && < 5
-                 , yesod                         >= 1.4.0      && < 1.5
-                 , yesod-core                    >= 1.4.0      && < 1.5
-                 , yesod-auth                    >= 1.4.0      && < 1.5
-                 , yesod-static                  >= 1.4.0      && < 1.5
-                 , yesod-form                    >= 1.4.0      && < 1.5
+                 , yesod                         >= 1.4        && < 1.5
+                 , yesod-core                    >= 1.4        && < 1.5
+                 , yesod-auth                    >= 1.4        && < 1.5
+                 , yesod-static                  >= 1.5        && < 1.6
+                 , yesod-form                    >= 1.4        && < 1.5
                  , bytestring                    >= 0.9        && < 0.11
                  , text                          >= 0.11       && < 2.0
-                 , persistent                    >= 2.0        && < 2.2
-                 , persistent-postgresql         >= 2.0        && < 2.2
+                 , persistent                    >= 2.0        && < 2.3
+                 , persistent-postgresql         >= 2.0        && < 2.3
                  , persistent-template           >= 2.0        && < 2.2
                  , template-haskell
                  , shakespeare                   >= 2.0        && < 2.1
@@ -67,12 +75,12 @@ library
                  , yaml                          >= 0.8        && < 0.9
                  , http-conduit                  >= 2.1        && < 2.2
                  , directory                     >= 1.1        && < 1.3
-                 , warp                          >= 3.0        && < 3.1
+                 , warp                          >= 3.0        && < 3.2
                  , data-default
                  , aeson                         >= 0.6        && < 0.9
                  , conduit                       >= 1.0        && < 2.0
-                 , monad-logger                  >= 0.3        && < 0.4
-                 , fast-logger                   >= 2.3        && < 2.4
+                 , monad-logger                  >= 0.3.13     && < 0.4
+                 , fast-logger                   >= 2.3        && < 2.5
                  , wai-logger                    >= 2.2        && < 2.3
                  , time
                  , http-types
@@ -85,6 +93,14 @@ library
                  , transformers
                  , wai
                  , containers
+                 , xml-conduit
+                 , xml-lens
+                 , lens
+                 , system-filepath
+                 , lens-aeson                    >= 1.0        && < 1.1
+                 , amazonka                      >= 1.3        && < 1.4
+                 , amazonka-s3                   >= 1.3        && < 1.4
+                 , zlib                          >= 0.5        && < 0.7
 
     -- see https://github.com/yesodweb/yesod/issues/814
     if !os(windows)
@@ -108,10 +124,29 @@ executable rebuildranks
 
     main-is:           rebuild.hs
     hs-source-dirs:    app
+    extensions:        FlexibleContexts
     build-depends:     base
                      , isaacranks
                      , yesod
                      , persistent
+                     , persistent-postgresql
+                     , monad-logger
+                     , transformers
+                     , time
+
+    ghc-options:       -threaded -O2 -rtsopts -with-rtsopts=-N
+
+executable load-data
+    if flag(library-only)
+        Buildable: False
+
+    main-is:           load.hs
+    hs-source-dirs:    app
+    build-depends:     base
+                     , isaacranks
+                     , yesod
+                     , persistent
+                     , persistent-postgresql
                      , monad-logger
 
     ghc-options:       -threaded -O2 -rtsopts -with-rtsopts=-N

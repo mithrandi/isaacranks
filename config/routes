@@ -4,7 +4,9 @@
 /robots.txt RobotsR GET
 
 / HomeR GET
-/vote VoteR GET POST
-/ranks RanksR GET
+/vote DefaultVoteR GET
+/ranks DefaultRanksR GET
+!/#IsaacVersion/vote VoteR GET POST
+!/#IsaacVersion/ranks RanksR GET
 /donate DonateR GET
 /changes ChangesR GET

@@ -1,0 +1,6 @@
+#!/bin/sh
+tag=$1
+source_dir=$2
+build_dir=$3
+echo $build_dir
+(cd $build_dir; npm run build || touch static/js/bundle.js; rm -rf .heroku node_modules)

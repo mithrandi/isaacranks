@@ -10,16 +10,21 @@ Email
     UniqueEmail email
 
 Item json
+    version IsaacVersion default='IsaacRebirth'
     isaacId Int
     name Text
     description Text
-    imageId Text default='000'
+    imageId Text default='000' SafeToRemove
     wiki Text default=''
     rating Double
     votes Int
-    UniqueItem isaacId
+    pools [IsaacPool] default='[]'
+    itype Text default='unknown'
+    UniqueItem version isaacId
+    deriving Show
 
 Vote json
+    version IsaacVersion default='IsaacRebirth'
     winner ItemId
     loser ItemId
     timestamp UTCTime
@@ -27,3 +32,8 @@ Vote json
     rawBallot Text Maybe
     UniqueBallot rawBallot !force
     fancy Bool Maybe
+
+Dump
+    bucket Text
+    path Text
+    timestamp UTCTime

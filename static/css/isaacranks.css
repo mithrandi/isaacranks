@@ -1,0 +1,26 @@
+body { padding-top: 70px; }
+
+.voting-enter {
+    opacity: 0;
+    transition: opacity .15s linear;
+}
+
+.voting-enter.voting-enter-active {
+    opacity: 1;
+}
+
+div {
+    outline: none;
+}
+
+table.ranks-table > tbody > tr > td {
+    vertical-align: middle;
+}
+
+table.ranks-table a.icon {
+    -webkit-scale: 0.75;
+}
+
+.vote-dump {
+    font-size: 70%;
+}

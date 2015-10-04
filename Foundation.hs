@@ -3,6 +3,7 @@ module Foundation where
 import qualified Database.Persist
 import           Database.Persist.Sql (SqlBackend)
 import           Model
+import           Model.IsaacVersion
 import           Network.HTTP.Client.Conduit (Manager, HasHttpManager (getHttpManager))
 import           Prelude
 import qualified Settings
@@ -65,7 +66,7 @@ instance Yesod App where
 
     defaultLayout widget = do
         master <- getYesod
-        mmsg <- getMessage
+        --mmsg <- getMessage
 
         -- We break up the default layout into two components:
         -- default-layout is the contents of the body tag, and
@@ -74,12 +75,11 @@ instance Yesod App where
         -- you to use normal widget features in default-layout.
 
         pc <- widgetToPageContent $ do
-            addStylesheetRemote "http://static.isaacranks.com/styles/bootstrap"
-            addStylesheetRemote "http://static.isaacranks.com/styles/bootstrap-theme"
-            addStylesheetRemote "http://static.isaacranks.com/styles/icons"
-            addScriptRemote "http://static.isaacranks.com/scripts/jquery-1.11.2"
-            addScriptRemote "http://static.isaacranks.com/scripts/bootstrap"
-            addScriptRemote "http://static.isaacranks.com/scripts/mousetrap-1.5.3"
+            addStylesheetRemote "http://static.isaacranks.com/styles/bootstrap-3.3.5"
+            addStylesheetRemote "http://static.isaacranks.com/styles/bootstrap-theme-3.3.5"
+            addStylesheetRemote "http://static.isaacranks.com/styles/icons-2"
+            addStylesheetRemote "http://static.isaacranks.com/fa-4.4.0/styles/font-awesome"
+            addStylesheet $ StaticR css_isaacranks_css
             $(widgetFile "default-layout")
         withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
@@ -136,11 +136,8 @@ instance YesodAuth App where
         x <- getBy $ UniqueUser $ credsIdent creds
         case x of
             Just (Entity uid _) -> return $ Just uid
-            Nothing -> do
-                fmap Just $ insert User
-                    { userIdent = credsIdent creds
-                    , userPassword = Nothing
-                    }
+            Nothing ->
+              Just <$> insert (User (credsIdent creds) Nothing)
 
     -- You can add other plugins like BrowserID, email or OAuth here
     authPlugins _ = [authBrowserId def]

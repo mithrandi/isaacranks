@@ -1,26 +1,4 @@
 $newline never
 <div .jumbotron>
   <h1>Item ranks
-  <p>#{votesCast} votes total, mean of #{showF meanVotes} per item.
-  <p>Mean rating is #{showF meanRating}.
-  <p>Normalized rating is normalized to range [0, 1000].
-
-<div .table-responsive>
-  <table .table .table-condensed .table-hover>
-    <tr>
-      <th>##
-      <th>Item ID
-      <th>Name
-      <th>Description
-      <th>Rating
-      <th>Normalized
-      <th>Votes
-    $forall (rank, Entity _ item) <- items
-      <tr>
-        <td>#{rank}
-        <td>#{itemIsaacId item}
-        <td>#{itemName item}
-        <td>#{itemDescription item}
-        <td>#{showF (itemRating item)}
-        <td>#{showF (normalizedRating item)}
-        <td>#{itemVotes item}
+  <p>Loading JavaScript... if you do not see the ranks load, make sure you have JavaScript enabled.

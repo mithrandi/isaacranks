@@ -3,22 +3,12 @@ $newline never
   <h1>News / Changelog
   <p>See the latest changes to the site here.
 
-<ul .list-group>
-  <li .list-group-item>
+<div .panel .panel-default>
+  <div .panel-body>
     <dl .dl-horizontal>
-      <dt>2015-01-12
-      <dd>
-        <ul>
-          <li>Implemented asynchronous voting; voting should now feel much faster, especially on higher-latency connections.
-          <li>Prevent accidentally voting multiple times in a row caused by holding down one of the key bindings.
-      <dt>2015-01-03
-      <dd>
-        <ul>
-          <li>Item titles and images now link to the wiki.
-          <li>Added keyboard shortcuts for voting.
-      <dt>2015-01-02
-      <dd>
-        <ul>
-          <li>Made the ranks table narrower.
-          <li>Tweaked the voting page display for medium size displays (eg. tablets).
-          <li>Added this changelog.
+      $forall (date, lines) <- changes
+        <dt>#{date}
+        <dd>
+          <ul>
+            $forall line <- lines
+              <li>#{line}
