@@ -29,9 +29,13 @@ Vote json
     loser ItemId
     timestamp UTCTime
     voter Text default=''
-    rawBallot Text Maybe
-    UniqueBallot rawBallot !force
-    fancy Bool Maybe
+    rawBallot Text Maybe MigrationOnly
+    fancy Bool Maybe SafeToRemove
+
+Ballot
+    ballot Text
+    timestamp UTCTime
+    Primary ballot
 
 Dump
     bucket Text
