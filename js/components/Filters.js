@@ -25,7 +25,7 @@ export default class Filters extends React.Component {
   , onToggle: P.func.isRequired
   , onAll: P.func.isRequired
   , onNone: P.func.isRequired
-  }
+  };
 
   render() {
     const {filters, onToggle, onAll, onNone} = this.props

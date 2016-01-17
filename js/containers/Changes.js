@@ -19,7 +19,7 @@ export default class Changes extends React.Component {
   static propTypes =
   { actions: P.objectOf(P.func).isRequired
   , changes: P.instanceOf(ChangesRecord).isRequired
-  }
+  };
 
   componentDidMount() {
     this.props.actions.loadChanges()

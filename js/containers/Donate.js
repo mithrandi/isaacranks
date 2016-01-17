@@ -4,7 +4,7 @@ import {Jumbotron, ListGroup, ListGroupItem} from 'react-bootstrap'
 import $script from 'scriptjs'
 
 export default class Donate extends React.Component {
-  state = {flattrLoaded: false}
+  state = {flattrLoaded: false};
 
   componentDidMount() {
     const node = ReactDOM.findDOMNode(this.refs.flattr)

@@ -16,11 +16,7 @@ module.exports =
 , module:
   { loaders:
     [ { test: /\.js$/
-      , loader: ['babel']
-      , query:
-        { optional: ['runtime']
-        , stage: 0
-        }
+      , loader: 'babel-loader'
       , exclude: /node_modules/
       , include: __dirname
       }

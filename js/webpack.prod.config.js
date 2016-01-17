@@ -28,15 +28,7 @@ module.exports =
 , module:
   { loaders:
     [ { test: /\.js$/
-      , loader: ['babel']
-      , query:
-        { optional:
-          [ 'runtime'
-          , 'optimisation.react.constantElements'
-          , 'optimisation.react.inlineElements'
-          ]
-        , stage: 0
-        }
+      , loader: 'babel-loader'
       , exclude: /node_modules/
       , include: __dirname
       }

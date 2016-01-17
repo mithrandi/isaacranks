@@ -29,7 +29,7 @@ export default class VotingPanel extends React.Component {
   , 'children': P.node
   , 'hotkeyName': P.string
   , 'hotkeyIcon': P.string
-  }
+  };
 
   render() {
     const link = this.props.href

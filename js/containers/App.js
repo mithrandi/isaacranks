@@ -7,7 +7,7 @@ import {LinkContainer} from 'react-router-bootstrap'
 export default class App extends React.Component {
   static propTypes =
   { children: PropTypes.node
-  }
+  };
 
   render() {
     return (

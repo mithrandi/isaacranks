@@ -6,7 +6,7 @@ export default class ItemIcon extends React.Component {
   { 'isaacId': P.number.isRequired
   , 'href': P.string.isRequired
   , 'title': P.string.isRequired
-  }
+  };
 
   render() {
     const itemId = zfill(3, this.props.isaacId)

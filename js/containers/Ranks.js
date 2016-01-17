@@ -21,7 +21,7 @@ export default class Ranks extends React.Component {
   static propTypes =
   { actions: P.objectOf(P.func).isRequired
   , ranks: P.instanceOf(RanksState).isRequired
-  }
+  };
 
   componentDidMount() {
     this.props.actions.loadRanks(this.props.params.version)

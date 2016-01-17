@@ -8,7 +8,7 @@ export default class VotingItemPanel extends React.Component {
   { 'ballot': IP.map
   , 'hotkeyName': P.string
   , 'hotkeyIcon': P.string
-  }
+  };
 
   render() {
     const {ballot} = this.props

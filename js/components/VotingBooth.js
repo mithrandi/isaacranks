@@ -1,7 +1,7 @@
 import React, {PropTypes as P} from 'react'
 import IP from 'react-immutable-proptypes'
 import CSSTransitionGroup from 'react-addons-css-transition-group'
-import {Row, Col} from 'react-bootstrap'
+import {Row} from 'react-bootstrap'
 import VotingPanel from './VotingPanel'
 import VotingItemPanel from './VotingItemPanel'
 
@@ -10,7 +10,7 @@ export default class VotingBooth extends React.Component {
   { onReroll: P.func.isRequired
   , left: IP.map
   , right: IP.map
-  }
+  };
 
   render() {
     const {left, right, onReroll} = this.props

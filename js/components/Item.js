@@ -6,7 +6,7 @@ export default class Item extends React.Component {
   { index: P.number.isRequired
   , item: P.object.isRequired
   , norm: P.number.isRequired
-  }
+  };
 
   render() {
     const {index, item, norm} = this.props

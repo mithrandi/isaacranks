@@ -6,7 +6,7 @@ export default class ErrorAlert extends React.Component {
   { 'title': P.string.isRequired
   , 'error': P.string.isRequired
   , 'onReset': P.func.isRequired
-  }
+  };
 
   render () {
     return (

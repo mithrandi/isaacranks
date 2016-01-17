@@ -8,7 +8,7 @@ export default class FilterButton extends React.Component {
   , activeFilters: IP.setOf(P.string).isRequired
   , label: P.string.isRequired
   , onToggle: P.func.isRequired
-  }
+  };
 
   render() {
     const {name, activeFilters, label, onToggle} = this.props

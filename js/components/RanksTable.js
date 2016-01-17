@@ -11,7 +11,7 @@ export default class RanksTable extends React.Component {
   , maxRating: P.number.isRequired
   , filters: IP.map.isRequired
   , items: P.arrayOf(P.object).isRequired
-  }
+  };
 
   render() {
     const {minRating, maxRating, filters} = this.props

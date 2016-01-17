@@ -38,9 +38,9 @@ export default class Vote extends React.Component {
   static propTypes =
   { actions: P.objectOf(P.func).isRequired
   , voting: IP.map.isRequired
-  }
+  };
 
-  state = {pressed: Map()}
+  state = {pressed: Map()};
 
   componentDidMount() {
     this.props.actions.loadBallot(this.props.params.version)
