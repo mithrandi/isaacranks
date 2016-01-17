@@ -14,6 +14,12 @@ export default class App extends React.Component {
       <div>
         <Navbar brand={<a href="/">Isaac Ranks</a>} toggleNavKey={0} inverse fixedTop>
           <Nav navbar eventKey={0}>
+            <LinkContainer to="/afterbirth/vote">
+              <NavItem>Vote (Afterbirth)</NavItem>
+            </LinkContainer>
+            <LinkContainer to="/afterbirth/ranks">
+              <NavItem>Ranks (Afterbirth)</NavItem>
+            </LinkContainer>
             <LinkContainer to="/rebirth/vote">
               <NavItem>Vote (Rebirth)</NavItem>
             </LinkContainer>

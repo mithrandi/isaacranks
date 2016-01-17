@@ -23,4 +23,4 @@ instance PathPiece IsaacVersion where
     _ -> Nothing
 
 instance Default IsaacVersion where
-  def = IsaacRebirth
+  def = IsaacAfterbirth
