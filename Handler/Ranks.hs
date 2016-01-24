@@ -12,7 +12,7 @@ getRanksR ver = do
       ranks = [1..]
   (items, votesCast, dump) <- runDB $ (,,)
     <$> ((ranks `zip`) <$> selectList [ItemVersion ==. ver] [Desc ItemRating])
-    <*> count ([] :: [Filter Vote])
+    <*> count [VoteVersion ==. ver]
     <*> selectFirst [] [Desc DumpTimestamp]
   let items' = map (entityVal . snd) items
       totalItems = genericLength items
