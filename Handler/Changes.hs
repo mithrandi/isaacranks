@@ -11,7 +11,14 @@ getChangesR = selectRep $ do
   provideJson changes
   where changes :: [(Text, [Text])]
         changes =
-          [ ( "2015-10-01"
+          [ ( "2016-01-24"
+            , [ "The Afterbirth update!"
+              , "Afterbirth voting: the ranks for all items are starting from zero, due to changes in existing items and other gameplay considerations."
+              , "Rebirth voting: the old Rebirth rankings are still available for viewing and voting, should anyone be interested."
+              , "Subreddit: This now exists at https://www.reddit.com/r/isaacranks/ — feel free to report bugs or discuss the site if you're into the Reddit thing."
+              ]
+            )
+          , ( "2015-10-01"
             , [ "The \"It Lives!\" update!"
               , "Reworked the client-side code; a modern browser with JavaScript enabled is now required for all functionality, but the UI should be a lot more robust."
               , "Dump the vote data on a periodic basis; see the ranks page for a link to the latest dump. Feel free to contact me if you'd like to do something with the vote data that isn't satisfied by this dump."
