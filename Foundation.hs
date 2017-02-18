@@ -15,7 +15,6 @@ import           Text.Jasmine (minifym)
 import qualified Web.ClientSession as WC
 import           Yesod
 import           Yesod.Auth
-import           Yesod.Auth.BrowserId
 import           Yesod.Core.Types (Logger)
 import           Yesod.Default.Config
 import           Yesod.Default.Util (addStaticContentExternal)
@@ -140,7 +139,7 @@ instance YesodAuth App where
               Just <$> insert (User (credsIdent creds) Nothing)
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [authBrowserId def]
+    authPlugins _ = []
 
     authHttpManager = httpManager
 
