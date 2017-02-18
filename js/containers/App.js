@@ -14,6 +14,12 @@ export default class App extends React.Component {
       <div>
         <Navbar brand={<a href="/">Isaac Ranks</a>} toggleNavKey={0} inverse fixedTop>
           <Nav navbar eventKey={0}>
+            <LinkContainer to="/afterbirthplus/vote">
+              <NavItem>Vote (Afterbirth+)</NavItem>
+            </LinkContainer>
+            <LinkContainer to="/afterbirthplus/ranks">
+              <NavItem>Ranks (Afterbirth+)</NavItem>
+            </LinkContainer>
             <LinkContainer to="/afterbirth/vote">
               <NavItem>Vote (Afterbirth)</NavItem>
             </LinkContainer>
@@ -37,7 +43,7 @@ export default class App extends React.Component {
         <div className="container">
           {this.props.children}
           <footer>
-            Website © 2014-2015 <a href="mailto:mithrandi@mithrandi.net">Tristan Seligmann</a> — I do not hold the copyright to any content from <a href="http://bindingofisaac.com/">The Binding of Isaac: Rebirth</a> or The Binding of Isaac: Afterbirth — Special thanks to <a href="https://www.reddit.com/r/bindingofisaac/">/r/bindingofisaac</a> and <a href="http://platinumgod.co.uk/">platinumgod.co.uk</a> — Come hang out in <a href="https://www.reddit.com/r/isaacranks">/r/isaacranks</a>!
+            Website © 2014-2017 <a href="mailto:mithrandi@mithrandi.net">Tristan Seligmann</a> — I do not hold the copyright to any content from <a href="http://bindingofisaac.com/">The Binding of Isaac: Rebirth</a> or The Binding of Isaac: Afterbirth — Special thanks to <a href="https://www.reddit.com/r/bindingofisaac/">/r/bindingofisaac</a> and <a href="http://platinumgod.co.uk/">platinumgod.co.uk</a> — Come hang out in <a href="https://www.reddit.com/r/isaacranks">/r/isaacranks</a>!
           </footer>
         </div>
       </div>

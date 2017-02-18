@@ -19,7 +19,7 @@ import           Network.Wreq (responseStatus, statusCode, checkStatus, defaults
 import qualified Network.Wreq.Session as S
 import qualified Text.XML as XML
 import           Text.XML.Lens (root, el, attr, attributeIs, attributeSatisfies, (./), localName)
-import           URI.ByteString (parseURI, strictURIParserOptions, uriPathL, URI(), serializeURI')
+import           URI.ByteString (parseURI, strictURIParserOptions, pathL, URI(), serializeURIRef')
 
 pools :: [(Text, IsaacPool)]
 pools =
@@ -73,6 +73,15 @@ wikiName name iid = case name of
   "GB Bug" -> "GB_Bug"
   "PJs" -> "PJs"
   "Lil Loki" -> "Lil'_Loki"
+  "Dark Princes Crown" -> "Dark_Prince's_Crown"
+  "YO LISTEN!" -> "YO_LISTEN!"
+  "Halo of Flies" -> "Halo_of_Flies"
+  "Lord of the Pit" -> "Lord_of_the_Pit"
+  "Charm of the Vampire" -> "Charm_of_the_Vampire"
+  "Cube of Meat" -> "Cube_of_Meat"
+  "Book of Revelations" -> "Book_of_Revelations"
+  "We Need To Go Deeper!" -> "We_Need_to_Go_Deeper!"
+  "Deck of Cards" -> "Deck_of_Cards"
   _ -> T.replace "'S" "'s" . T.replace " " "_"  . T.toTitle $ name
 
 loadData :: String -> FilePath -> FilePath -> ReaderT SqlBackend (LoggingT IO) ()
@@ -86,13 +95,14 @@ loadData ver itemsPath poolsPath = do
           iid :: Int
           iid = item ^?! attr "id" . unpacked . _Show
           itype = item ^. localName
-          wiki = wikiBase & uriPathL . unpackedChars . from unpacked <>~ wikiName name iid
-          wikiS = wiki ^. to serializeURI' . unpackedChars
+          wiki = wikiBase & pathL . unpackedChars . from unpacked <>~ wikiName name iid
+          wikiS = wiki ^. to serializeURIRef' . unpackedChars
+          wikiText :: Text
           wikiText = wikiS ^. from unpacked
       r <- retry 5 $ S.headWith
         (set checkStatus (Just $ \_ _ _ -> Nothing) defaults)
         sess
-        (wiki ^. to serializeURI' . unpackedChars)
+        (wiki ^. to serializeURIRef' . unpackedChars)
       unless (r ^. responseStatus . statusCode == 200) (print $ "Invalid wiki: " <> wikiText)
       return
         Item { _itemVersion = ver'

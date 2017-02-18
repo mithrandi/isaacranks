@@ -8,6 +8,7 @@ import Yesod
 
 data IsaacVersion = IsaacRebirth
                   | IsaacAfterbirth
+                  | IsaacAfterbirthPlus
                   deriving (Show, Read, Eq, Ord)
 
 derivePersistField "IsaacVersion"
@@ -17,10 +18,12 @@ instance PathPiece IsaacVersion where
   toPathPiece = \case
     IsaacRebirth -> "rebirth"
     IsaacAfterbirth -> "afterbirth"
+    IsaacAfterbirthPlus -> "afterbirthplus"
   fromPathPiece = \case
     "rebirth" -> Just IsaacRebirth
     "afterbirth" -> Just IsaacAfterbirth
+    "afterbirthplus" -> Just IsaacAfterbirthPlus
     _ -> Nothing
 
 instance Default IsaacVersion where
-  def = IsaacAfterbirth
+  def = IsaacAfterbirthPlus

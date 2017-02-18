@@ -24,6 +24,10 @@ $newline never
                      <a .navbar-brand href=@{HomeR}>Isaac Ranks
                  <div #navbar .navbar-collapse .collapse>
                      <ul .nav .navbar-nav>
+                          <li>
+                             <a href=@{VoteR IsaacAfterbirthPlus}>Vote (Afterbirth+)
+                         <li>
+                             <a href=@{RanksR IsaacAfterbirthPlus}>Ranks (Afterbirth+)
                          <li>
                              <a href=@{VoteR IsaacAfterbirth}>Vote (Afterbirth)
                          <li>

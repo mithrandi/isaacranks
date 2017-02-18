@@ -63,11 +63,20 @@ reprocessVotes = do
   updateWhere [] [ItemRating =. 500.1, ItemVotes =. 0]
   items <- M.fromList . map (\(Entity a b) -> (a, b)) <$> selectList [] []
   votes <- map entityVal <$> selectList [] [Asc VoteTimestamp]
-  forM_ (M.toList $ foldl' applyVote items votes) $
-    \(itemId, Item {_itemRating = r, _itemVotes = v}) -> update itemId [ItemRating =. r, ItemVotes =. v]
+  recalculateELO items votes
   now <- liftIO getCurrentTime
   deleteWhere [BallotTimestamp <=. (-validTime) `addUTCTime` now]
   return (items, votes)
+
+recalculateELO ::
+  (MonadIO m) => M.Map (Key Item) Item -> [Vote] -> ReaderT SqlBackend m ()
+recalculateELO items votes =
+  forM_ (M.toList $ foldl' applyVote items votes) $
+    \(itemId, Item {_itemRating = r, _itemVotes = v}) -> update itemId [ItemRating =. r, ItemVotes =. v]
+
+recalculatePairs ::
+  (MonadIO m) => M.Map (Key Item) Item -> [Vote] -> ReaderT SqlBackend m ()
+recalculatePairs items votes = undefined
 
 serializeVotes :: M.Map (Key Item) Item -> [Vote] -> Value
 serializeVotes items votes = _Array._Wrapped # map asJson votes
