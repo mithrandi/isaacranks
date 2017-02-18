@@ -11,7 +11,13 @@ getChangesR = selectRep $ do
   provideJson changes
   where changes :: [(Text, [Text])]
         changes =
-          [ ( "2016-01-24"
+          [ ( "2017-02-??"
+            , [ "The Afterbirth+ update!"
+              , "Afterbirth+ voting: the ranks are starting from scratch, as with Afterbirth."
+              , "New ranking algorithm that should perform better than the old ELO-based one."
+              ]
+            )
+          , ( "2016-01-24"
             , [ "The Afterbirth update!"
               , "Afterbirth voting: the ranks for all items are starting from zero, due to changes in existing items and other gameplay considerations."
               , "Rebirth voting: the old Rebirth rankings are still available for viewing and voting, should anyone be interested."
