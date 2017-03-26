@@ -14,14 +14,12 @@ export default class RanksTable extends React.Component {
   };
 
   render() {
-    const {minRating, maxRating, filters} = this.props
-    const ratingRange = maxRating - minRating
+    const {filters} = this.props
     const pools = filters.get(POOL)
     const types = filters.get(TYPE)
     const items = this.props.items.map((item, index) => {
-      const norm = (item.rating - minRating) / ratingRange * 1000
       if (Set(item.pools).add('SPECIAL').intersect(pools).size > 0 && types.has(item.itype))
-        return <Item key={item.isaacId} index={index} item={item} norm={norm} />
+        return <Item key={item.isaacId} index={index} item={item} />
     })
     return (
       <Table condensed hover responsive className="ranks-table">
@@ -31,8 +29,6 @@ export default class RanksTable extends React.Component {
             <th />
             <th>Name</th>
             <th>Description</th>
-            <th>Rating</th>
-            <th>Normalized</th>
             <th>Votes</th>
           </tr>
         </thead>

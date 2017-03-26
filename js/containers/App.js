@@ -39,7 +39,7 @@ export default class App extends React.Component {
               <div className="container">
                 {this.props.children}
                 <footer>
-                  Website © 2014-2017 <a href="mailto:mithrandi@mithrandi.net">Tristan Seligmann</a> — I do not hold the copyright to any content from <a href="http://bindingofisaac.com/">The Binding of Isaac: Rebirth</a> or The Binding of Isaac: Afterbirth — Special thanks to <a href="https://www.reddit.com/r/bindingofisaac/">/r/bindingofisaac</a> and <a href="http://platinumgod.co.uk/">platinumgod.co.uk</a> — Come hang out in <a href="https://www.reddit.com/r/isaacranks">/r/isaacranks</a>!
+                  Website © 2014-2017 <a href="mailto:mithrandi@mithrandi.net">Tristan Seligmann</a> — I do not hold the copyright to any content from <a href="http://bindingofisaac.com/">The Binding of Isaac</a> — Special thanks to <a href="https://www.reddit.com/r/bindingofisaac/">/r/bindingofisaac</a> and <a href="http://platinumgod.co.uk/">platinumgod.co.uk</a> — Come hang out in <a href="https://www.reddit.com/r/isaacranks">/r/isaacranks</a>!
                 </footer>
               </div>
             </div>

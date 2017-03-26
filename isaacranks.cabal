@@ -65,6 +65,7 @@ library
                  , bytestring                    >= 0.9        && < 0.11
                  , clientsession
                  , conduit                       >= 1.0        && < 2.0
+                 , conduit-combinators
                  , containers
                  , data-default
                  , directory                     >= 1.1        && < 1.4
@@ -131,6 +132,7 @@ executable rebuildranks
                      , yesod
                      , persistent
                      , persistent-postgresql
+                     , resourcet
                      , monad-logger
                      , transformers
                      , time

@@ -9,15 +9,13 @@ export default class Item extends React.Component {
   };
 
   render() {
-    const {index, item, norm} = this.props
+    const {index, item} = this.props
     return (
       <tr>
         <td>{index + 1}</td>
         <td><ItemIcon isaacId={item.isaacId} href={item.wiki} title={item.name} /></td>
         <td><a href={item.wiki}>{item.name}</a></td>
         <td>"{item.description}"</td>
-        <td>{item.rating.toFixed(2)}</td>
-        <td>{norm.toFixed(2)}</td>
         <td>{item.votes}</td>
       </tr>
     )

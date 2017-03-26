@@ -1,8 +1,8 @@
 module Vote where
 
 import           Codec.Compression.GZip (compressWith, defaultCompressParams, bestCompression, CompressParams(compressLevel))
+import           Conduit (foldlC, ($$), (=$), mapC, Consumer)
 import           Control.Lens
-import           Control.Monad (forM_)
 import           Control.Monad.Trans.Reader (ReaderT)
 import           Control.Monad.Trans.Resource (runResourceT)
 import           Data.Aeson (encode)
@@ -13,7 +13,8 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 import           Data.ByteString.Lazy (toStrict, fromStrict)
 import qualified Data.ByteString.Lazy as LBS
-import           Data.List (foldl')
+import           Data.Foldable (for_)
+import           Data.List (foldl', sortOn)
 import qualified Data.Map.Strict as M
 import           Data.Maybe (fromMaybe)
 import qualified Data.Text as T
@@ -58,26 +59,46 @@ applyVote items vote =
         adjustRating a = M.adjust
                          (\i -> i & itemRating +~ a & itemVotes +~ 1)
 
-reprocessVotes ::
-  (MonadIO m) => ReaderT SqlBackend m (M.Map (Key Item) Item, [Vote])
+reprocessVotes :: (MonadIO m, MonadResource m) => ReaderT SqlBackend m ()
 reprocessVotes = do
   updateWhere [] [ItemRating =. 500.1, ItemVotes =. 0]
-  items <- M.fromList . map (\(Entity a b) -> (a, b)) <$> selectList [] []
-  votes <- map entityVal <$> selectList [] [Asc VoteTimestamp]
-  recalculateELO items votes
+  recalculatePairs
   now <- liftIO getCurrentTime
   deleteWhere [BallotTimestamp <=. (-validTime) `addUTCTime` now]
-  return (items, votes)
+  return ()
 
 recalculateELO ::
   (MonadIO m) => M.Map (Key Item) Item -> [Vote] -> ReaderT SqlBackend m ()
 recalculateELO items votes =
-  forM_ (M.toList $ foldl' applyVote items votes) $
+  for_ (M.toList $ foldl' applyVote items votes) $
     \(itemId, Item {_itemRating = r, _itemVotes = v}) -> update itemId [ItemRating =. r, ItemVotes =. v]
 
-recalculatePairs ::
-  (MonadIO m) => M.Map (Key Item) Item -> [Vote] -> ReaderT SqlBackend m ()
-recalculatePairs items votes = undefined
+type BeatMatrix = M.Map (Key Item, Key Item) Int
+
+beatMatrix :: Monad m => Consumer Vote m (M.Map IsaacVersion BeatMatrix)
+beatMatrix = foldlC upd M.empty
+  where upd bm v = over (at ver . non M.empty . at (w, l) . non 0) (+1) bm
+          where w = v ^. voteWinner
+                l = v ^. voteLoser
+                ver = v ^. voteVersion
+
+ranks :: BeatMatrix -> [Key Item] -> [Key Item]
+ranks bm items = smooth (sortOn (negate . wins) items)
+  where wins i = length . filter (>0) . map (result i) $ items
+        result i1 i2 = bm ^. at (i1, i2) . non 0
+        smooth (i1:i2:is) | result i1 i2 < result i2 i1 = i2:smooth (i1:is)
+                          | otherwise                   = i1:smooth (i2:is)
+        smooth is = is
+
+recalculatePairs :: (MonadIO m, MonadResource m) => ReaderT SqlBackend m ()
+recalculatePairs = do
+  items <- M.fromList . map (\(Entity a b) -> (a, b)) <$> selectList [] []
+  bms <- selectSource [] [] $$ mapC entityVal =$ beatMatrix
+  ifor_ bms $ \ver bm ->
+    ifor_ (ranks bm (itemsFor ver items)) $ \rank itemId ->
+      update itemId [ ItemRating =. -(fromIntegral rank)
+                    , ItemVotes =. sumOf (ifolded.ifiltered (\(i1, i2) _ -> i1 == itemId || i2 == itemId)) bm]
+  where itemsFor ver = findIndicesOf ifolded (\i -> i ^. itemVersion == ver)
 
 serializeVotes :: M.Map (Key Item) Item -> [Vote] -> Value
 serializeVotes items votes = _Array._Wrapped # map asJson votes

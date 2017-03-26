@@ -11,11 +11,12 @@ getChangesR = selectRep $ do
   provideJson changes
   where changes :: [(Text, [Text])]
         changes =
-          [ ( "2017-02-??"
+          [ ( "2017-03-??"
             , [ "The Afterbirth+ update!"
               , "Afterbirth+ voting: the ranks are starting from scratch, as with Afterbirth."
               , "New ranking algorithm that should perform better than the old ELO-based one."
               , "Minor visual tweaks"
+              , "Vote data export disabled due to limitations with the old export format; please contact me if you're interested in the raw vote data."
               ]
             )
           , ( "2016-01-24"
