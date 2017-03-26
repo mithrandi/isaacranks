@@ -24,16 +24,16 @@ export default class Ranks extends React.Component {
   };
 
   componentDidMount() {
-    this.props.actions.loadRanks(this.props.params.version)
+    this.props.actions.loadRanks(this.props.match.params.version)
   }
 
   componentWillReceiveProps(nextProps) {
-    nextProps.actions.loadRanks(nextProps.params.version)
+    nextProps.actions.loadRanks(nextProps.match.params.version)
   }
 
   render() {
     const {actions} = this.props
-    const {version} = this.props.params
+    const {version} = this.props.match.params
     const ranks = this.props.ranks.ranks.get(version)
     if (ranks === undefined || ranks.get('loading')) {
       return (

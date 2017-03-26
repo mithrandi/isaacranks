@@ -43,11 +43,11 @@ export default class Vote extends React.Component {
   state = {pressed: Map()};
 
   componentDidMount() {
-    this.props.actions.loadBallot(this.props.params.version)
+    this.props.actions.loadBallot(this.props.match.params.version)
   }
 
   componentWillReceiveProps(nextProps) {
-    nextProps.actions.loadBallot(nextProps.params.version)
+    nextProps.actions.loadBallot(nextProps.match.params.version)
   }
 
   render() {
@@ -68,7 +68,7 @@ export default class Vote extends React.Component {
         )
     }
 
-    const {version} = this.props.params
+    const {version} = this.props.match.params
     const ballot = voting.getIn([version, 'ballots', 0], Map())
     const ballotLeft = ballot.get('ballotLeft')
     const ballotRight = ballot.get('ballotRight')

@@ -10,6 +10,10 @@ const initialState = fromJS(
     { ballots: []
     , voting: false
     }
+  , 'afterbirthplus':
+    { ballots: []
+    , voting: false
+    }
   })
 
 export default function voting(state = initialState, action){

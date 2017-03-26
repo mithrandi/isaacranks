@@ -1,15 +1,7 @@
 flags: {}
 packages:
 - /home/mithrandi/code/isaacranks
-- location:
-    git: https://github.com/yesodweb/yesod
-    commit: f3fc735a25eb3d5c051c761b59070eb9a0e4e156
-  subdirs:
-  - yesod-bin
-  extra-dep: true
 extra-deps:
-- esqueleto-2.5.1
 - heroku-0.1.2.3
-- say-0.1.0.0
-- typed-process-0.1.0.0
-resolver: lts-7.17
+- yesod-bin-1.5.2.1
+resolver: lts-8.5

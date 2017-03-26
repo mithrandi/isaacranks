@@ -15,7 +15,7 @@ import           Database.Persist.Sql (SqlBackend)
 import           Import
 import           Model.IsaacPool
 import           Model.IsaacVersion
-import           Network.Wreq (responseStatus, statusCode, checkStatus, defaults)
+import           Network.Wreq (responseStatus, statusCode, checkResponse, defaults)
 import qualified Network.Wreq.Session as S
 import qualified Text.XML as XML
 import           Text.XML.Lens (root, el, attr, attributeIs, attributeSatisfies, (./), localName)
@@ -69,20 +69,26 @@ wikiName name iid = case name of
   "BBF" -> "BBF"
   "BFFS!" -> "BFFS!"
   "Lil Chest" -> "Lil'_Chest"
-  "Holy Light" -> "Holy_Light!"
+  "Holy Light" -> "Holy_Light"
   "GB Bug" -> "GB_Bug"
   "PJs" -> "PJs"
   "Lil Loki" -> "Lil'_Loki"
   "Dark Princes Crown" -> "Dark_Prince's_Crown"
   "YO LISTEN!" -> "YO_LISTEN!"
-  "Halo of Flies" -> "Halo_of_Flies"
-  "Lord of the Pit" -> "Lord_of_the_Pit"
-  "Charm of the Vampire" -> "Charm_of_the_Vampire"
-  "Cube of Meat" -> "Cube_of_Meat"
-  "Book of Revelations" -> "Book_of_Revelations"
+  "Blood of the Martyr" -> "Blood_Of_The_Martyr"
   "We Need To Go Deeper!" -> "We_Need_to_Go_Deeper!"
-  "Deck of Cards" -> "Deck_of_Cards"
-  _ -> T.replace "'S" "'s" . T.replace " " "_"  . T.toTitle $ name
+  "Lil Haunt" -> "Lil'_Haunt"
+  "Box of Friends" -> "Box_Of_Friends"
+  "Curse of the tower" -> "Curse_Of_The_Tower"
+  "Crown Of Light" -> "Crown_Of_Light"
+  "Circle of Protection" -> "Circle_Of_Protection"
+  "Head of the Keeper" -> "Head_Of_The_Keeper"
+  "Shard of Glass" -> "Shard_Of_Glass"
+  "Eye of Greed" -> "Eye_Of_Greed"
+  "Eye of Belial" -> "Eye_Of_Belial"
+  "Sack of Sacks" -> "Sack_Of_Sacks"
+  "Buddy in a box" -> "Buddy_in_a_Box"
+  _ -> T.replace "The" "the" . T.replace "For" "for" . T.replace "Of" "of" . T.replace "'S" "'s" . T.replace " " "_"  . T.toTitle $ name
 
 loadData :: String -> FilePath -> FilePath -> ReaderT SqlBackend (LoggingT IO) ()
 loadData ver itemsPath poolsPath = do
@@ -100,7 +106,7 @@ loadData ver itemsPath poolsPath = do
           wikiText :: Text
           wikiText = wikiS ^. from unpacked
       r <- retry 5 $ S.headWith
-        (set checkStatus (Just $ \_ _ _ -> Nothing) defaults)
+        (defaults & checkResponse ?~ \_ _ -> return ())
         sess
         (wiki ^. to serializeURIRef' . unpackedChars)
       unless (r ^. responseStatus . statusCode == 200) (print $ "Invalid wiki: " <> wikiText)

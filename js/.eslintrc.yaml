@@ -1,0 +1,46 @@
+parser: 'babel-eslint'
+rules:
+  indent:
+    - 2
+    - 4
+    - SwitchCase: 1
+  quotes:
+    - 2
+    - single
+  linebreak-style:
+    - 2
+    - unix
+  semi:
+    - 2
+    - never
+  no-unused-vars:
+    - 2
+    - args: 'none'
+  valid-jsdoc:
+    - error
+    - prefer:
+        arg: param
+        argument: param
+        returns: return
+      preferType:
+        Boolean: boolean
+        Number: number
+        String: string
+        Object: object
+      requireReturn: false
+      requireReturnDescription: false
+env:
+  browser: true
+  node: true
+  es6: true
+extends:
+  - 'eslint:recommended'
+  - 'plugin:react/recommended'
+ecmaVersion: 6
+parserOptions:
+  sourceType: 'module'
+  ecmaFeatures:
+    jsx: true
+    experimentalObjectRestSpread: true
+plugins:
+  - react

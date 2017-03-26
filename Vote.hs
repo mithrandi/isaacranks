@@ -4,6 +4,7 @@ import           Codec.Compression.GZip (compressWith, defaultCompressParams, be
 import           Control.Lens
 import           Control.Monad (forM_)
 import           Control.Monad.Trans.Reader (ReaderT)
+import           Control.Monad.Trans.Resource (runResourceT)
 import           Data.Aeson (encode)
 import           Data.Aeson.Lens (_JSON, _Object, _Array)
 import           Data.Binary.Get (runGet, getWord32be)
@@ -22,8 +23,8 @@ import           Data.Time.Clock.POSIX (getPOSIXTime, posixSecondsToUTCTime, utc
 import           Database.Persist.Sql (SqlBackend)
 import           Import
 import           Model.IsaacVersion
-import           Network.AWS
-import           Network.AWS.S3
+import           Network.AWS (Env, runAWS, newEnv, Credentials(FromEnv), toBody, send)
+import           Network.AWS.S3 (poCacheControl, poContentDisposition, poCacheControl, poContentEncoding, poContentType, ObjectKey(..), BucketName(..), putObject)
 import           System.Environment (lookupEnv)
 import qualified Web.ClientSession as WS
 
@@ -92,7 +93,7 @@ gzJson = compressWith defaultCompressParams { compressLevel = bestCompression }
          . encode
 
 staticEnv :: IO Network.AWS.Env
-staticEnv = newEnv NorthVirginia (FromEnv "ISAACRANKS_AWS_ACCESS_KEY_ID" "ISAACRANKS_AWS_SECRET_ACCESS_KEY" Nothing)
+staticEnv = newEnv (FromEnv "ISAACRANKS_AWS_ACCESS_KEY_ID" "ISAACRANKS_AWS_SECRET_ACCESS_KEY" Nothing Nothing)
 
 staticConfig :: IO (Text, Text)
 staticConfig = do
