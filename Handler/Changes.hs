@@ -15,6 +15,7 @@ getChangesR = selectRep $ do
             , [ "The Afterbirth+ update!"
               , "Afterbirth+ voting: the ranks are starting from scratch, as with Afterbirth."
               , "New ranking algorithm that should perform better than the old ELO-based one."
+              , "Minor visual tweaks"
               ]
             )
           , ( "2016-01-24"

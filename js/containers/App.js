@@ -1,17 +1,9 @@
 import React, {PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {Navbar, Nav} from 'react-bootstrap'
-import {Link} from 'react-router-dom'
-import classnames from 'classnames'
+import {Navbar, Nav, NavItem, NavDropdown} from 'react-bootstrap'
+//import {LinkContainer} from 'react-router-bootstrap'
+import LinkContainer from '../components/LinkContainer'
 
-const NavItem = ({className, active, disabled, style, children}) => {
-    const classNames = classnames(className, { active, disabled })
-    return (
-        <li role="presentation" style={style} className={classNames}>
-          {children}
-        </li>
-    )
-}
 
 @connect(state => ({routerState: state.router}))
 export default class App extends React.Component {
@@ -29,14 +21,18 @@ export default class App extends React.Component {
                 </Navbar.Header>
                 <Navbar.Collapse>
                   <Nav navbar>
-                    <NavItem eventKey={0}><Link to="/afterbirthplus/vote">Vote (Afterbirth+)</Link></NavItem>
-                    <NavItem eventKey={1}><Link to="/afterbirthplus/ranks">Ranks (Afterbirth+)</Link></NavItem>
-                    <NavItem eventKey={2}><Link to="/afterbirth/vote">Vote (Afterbirth)</Link></NavItem>
-                    <NavItem eventKey={3}><Link to="/afterbirth/ranks">Ranks (Afterbirth)</Link></NavItem>
-                    <NavItem eventKey={4}><Link to="/rebirth/vote">Vote (Rebirth)</Link></NavItem>
-                    <NavItem eventKey={5}><Link to="/rebirth/ranks">Ranks (Rebirth)</Link></NavItem>
-                    <NavItem eventKey={6}><Link to="/donate">Donate</Link></NavItem>
-                    <NavItem eventKey={7}><Link to="/changes">News</Link></NavItem>
+                    <NavDropdown eventKey="0" title="Vote" id="nav-dropdown-vote">
+                      <LinkContainer to="/afterbirthplus/vote"><NavItem eventKey="0.1">Afterbirth+</NavItem></LinkContainer>
+                      <LinkContainer to="/afterbirth/vote"><NavItem eventKey="0.2">Afterbirth</NavItem></LinkContainer>
+                      <LinkContainer to="/rebirth/vote"><NavItem eventKey="0.3">Rebirth</NavItem></LinkContainer>
+                    </NavDropdown>
+                    <NavDropdown eventKey="1" title="Ranks" id="nav-dropdown-ranks">
+                      <LinkContainer to="/afterbirthplus/ranks"><NavItem eventKey="1.1">Afterbirth+</NavItem></LinkContainer>
+                      <LinkContainer to="/afterbirth/ranks"><NavItem eventKey="1.2">Afterbirth</NavItem></LinkContainer>
+                      <LinkContainer to="/rebirth/ranks"><NavItem eventKey="1.3">Rebirth</NavItem></LinkContainer>
+                    </NavDropdown>
+                    <LinkContainer to="/donate"><NavItem eventKey="2">Donate</NavItem></LinkContainer>
+                    <LinkContainer to="/changes"><NavItem eventKey="3">News</NavItem></LinkContainer>
                   </Nav>
                 </Navbar.Collapse>
               </Navbar>
