@@ -24,21 +24,31 @@ $newline never
                      <a .navbar-brand href=@{HomeR}>Isaac Ranks
                  <div #navbar .navbar-collapse .collapse>
                      <ul .nav .navbar-nav>
-                          <li>
-                             <a href=@{VoteR IsaacAfterbirthPlus}>Vote (Afterbirth+)
-                         <li>
-                             <a href=@{RanksR IsaacAfterbirthPlus}>Ranks (Afterbirth+)
-                         <li>
-                             <a href=@{VoteR IsaacAfterbirth}>Vote (Afterbirth)
-                         <li>
-                             <a href=@{RanksR IsaacAfterbirth}>Ranks (Afterbirth)
-                         <li>
-                             <a href=@{VoteR IsaacRebirth}>Vote (Rebirth)
-                         <li>
-                             <a href=@{RanksR IsaacRebirth}>Ranks (Rebirth)
-                         <li>
+                         <li .dropdown>
+                             <a #nav-dropdown-vote role="button" .dropdown-toggle aria-haspopup="true" aria-expanded="false" href="#">
+                                Vote #
+                                <span .caret>
+                             <ul role="menu" .dropdown-menu aria-labelledby="nav-dropdown-vote">
+                                <li role="presentation">
+                                    <a href=@{VoteR IsaacAfterbirthPlus}>Afterbirth+
+                                <li role="presentation">
+                                    <a href=@{VoteR IsaacAfterbirth}>Afterbirth
+                                <li role="presentation">
+                                    <a href=@{VoteR IsaacRebirth}>Rebirth
+                         <li .dropdown>
+                             <a #nav-dropdown-ranks role="button" .dropdown-toggle aria-haspopup="true" aria-expanded="false" href="#">
+                                Ranks #
+                                <span .caret>
+                             <ul role="menu" .dropdown-menu aria-labelledby="nav-dropdown-ranks">
+                                <li role="presentation">
+                                    <a href=@{RanksR IsaacAfterbirthPlus}>Afterbirth+
+                                <li role="presentation">
+                                    <a href=@{RanksR IsaacAfterbirth}>Afterbirth
+                                <li role="presentation">
+                                    <a href=@{RanksR IsaacRebirth}>Rebirth
+                         <li role="presentation">
                              <a href=@{DonateR}>Donate
-                         <li>
+                         <li role="presentation">
                              <a href=@{ChangesR}>News
         <div .container>
             <header>
