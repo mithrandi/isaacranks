@@ -13,8 +13,7 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 import           Data.ByteString.Lazy (toStrict, fromStrict)
 import qualified Data.ByteString.Lazy as LBS
-import           Data.Foldable (for_)
-import           Data.List (foldl', sortOn)
+import           Data.List (sortOn)
 import qualified Data.Map.Strict as M
 import           Data.Maybe (fromMaybe)
 import qualified Data.Text as T
