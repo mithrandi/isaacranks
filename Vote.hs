@@ -29,15 +29,6 @@ import           Network.AWS.S3 (poCacheControl, poContentDisposition, poCacheCo
 import           System.Environment (lookupEnv)
 import qualified Web.ClientSession as WS
 
-k :: Double
-k = 24.0
-
-adjustment :: Double -> Double -> Double
-adjustment s e = k * (s - e)
-
-expected :: Double -> Double -> Double
-expected r1 r2 = 1 / (1 + 10 ** ((r2 - r1) / 400))
-
 processVote :: MonadIO m => IsaacVersion -> Int -> Int -> UTCTime -> Text -> Text -> ReaderT SqlBackend m ()
 processVote ver w l timestamp voter rawBallot = do
   Just (Entity w' _) <- getBy $ UniqueItem ver w
@@ -46,19 +37,6 @@ processVote ver w l timestamp voter rawBallot = do
   _ <- insert $ Vote ver w' l' timestamp voter
   return ()
 
-applyVote :: M.Map (Key Item) Item -> Vote -> M.Map (Key Item) Item
-applyVote items vote =
-  adjustRating (adjustment 1.0 (expected wr lr)) w .
-  adjustRating (adjustment 0.0 (expected lr wr)) l $ items
-  where w = vote^.voteWinner
-        l = vote^.voteLoser
-        (Just winner) = items^.at w
-        (Just loser) = items^.at l
-        wr = winner^.itemRating
-        lr = loser^.itemRating
-        adjustRating a = M.adjust
-                         (\i -> i & itemRating +~ a & itemVotes +~ 1)
-
 reprocessVotes :: (MonadIO m, MonadResource m) => ReaderT SqlBackend m ()
 reprocessVotes = do
   updateWhere [] [ItemRating =. 500.1, ItemVotes =. 0]
@@ -66,12 +44,6 @@ reprocessVotes = do
   now <- liftIO getCurrentTime
   deleteWhere [BallotTimestamp <=. (-validTime) `addUTCTime` now]
   return ()
-
-recalculateELO ::
-  (MonadIO m) => M.Map (Key Item) Item -> [Vote] -> ReaderT SqlBackend m ()
-recalculateELO items votes =
-  for_ (M.toList $ foldl' applyVote items votes) $
-    \(itemId, Item {_itemRating = r, _itemVotes = v}) -> update itemId [ItemRating =. r, ItemVotes =. v]
 
 type BeatMatrix = M.Map (Key Item, Key Item) Int
 
