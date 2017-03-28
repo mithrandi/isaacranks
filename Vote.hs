@@ -38,13 +38,15 @@ processVote ver w l timestamp voter rawBallot = do
 
 reprocessVotes :: (MonadIO m, MonadResource m) => ReaderT SqlBackend m ()
 reprocessVotes = do
-  updateWhere [] [ItemRating =. 500.1, ItemVotes =. 0]
-  recalculatePairs
+  items <- M.fromList . map (\(Entity a b) -> (a, b)) <$> selectList [] []
+  bms <- selectSource [] [] $$ mapC entityVal =$ beatMatrix
+  recalculatePairs items bms
   now <- liftIO getCurrentTime
   deleteWhere [BallotTimestamp <=. (-validTime) `addUTCTime` now]
   return ()
 
-type BeatMatrix = M.Map (Key Item, Key Item) Int
+type Matchup = (Key Item, Key Item)
+type BeatMatrix = M.Map Matchup Int
 
 beatMatrix :: Monad m => Consumer Vote m (M.Map IsaacVersion BeatMatrix)
 beatMatrix = foldlC upd M.empty
@@ -61,10 +63,8 @@ ranks bm items = smooth (sortOn (negate . wins) items)
                           | otherwise                   = i1:smooth (i2:is)
         smooth is = is
 
-recalculatePairs :: (MonadIO m, MonadResource m) => ReaderT SqlBackend m ()
-recalculatePairs = do
-  items <- M.fromList . map (\(Entity a b) -> (a, b)) <$> selectList [] []
-  bms <- selectSource [] [] $$ mapC entityVal =$ beatMatrix
+recalculatePairs :: (MonadIO m, MonadResource m) => M.Map (Key Item) Item -> M.Map IsaacVersion BeatMatrix -> ReaderT SqlBackend m ()
+recalculatePairs items bms =
   ifor_ bms $ \ver bm ->
     ifor_ (ranks bm (itemsFor ver items)) $ \rank itemId ->
       update itemId [ ItemRating =. -(fromIntegral rank)
