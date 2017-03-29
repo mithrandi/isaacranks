@@ -88,7 +88,12 @@ wikiName name iid = case name of
   "Eye of Belial" -> "Eye_Of_Belial"
   "Sack of Sacks" -> "Sack_Of_Sacks"
   "Buddy in a box" -> "Buddy_in_a_Box"
-  _ -> T.replace "The" "the" . T.replace "For" "for" . T.replace "Of" "of" . T.replace "'S" "'s" . T.replace " " "_"  . T.toTitle $ name
+  _ -> T.replace "The" "the"
+      . T.replace "For" "for"
+      . T.replace "Of" "of"
+      . T.replace "'S" "'s"
+      . T.replace " " "_"
+      . T.toTitle $ name
 
 loadData :: String -> FilePath -> FilePath -> ReaderT SqlBackend (LoggingT IO) ()
 loadData ver itemsPath poolsPath = do
