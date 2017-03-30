@@ -76,7 +76,7 @@ instance Yesod App where
         pc <- widgetToPageContent $ do
             addStylesheetRemote "http://static.isaacranks.com/styles/bootstrap-3.3.5"
             addStylesheetRemote "http://static.isaacranks.com/styles/bootstrap-theme-3.3.5"
-            addStylesheetRemote "http://static.isaacranks.com/styles/icons-3"
+            addStylesheetRemote "http://static.isaacranks.com/styles/icons-4"
             addStylesheetRemote "http://static.isaacranks.com/fa-4.4.0/styles/font-awesome"
             addStylesheet $ StaticR css_isaacranks_css
             $(widgetFile "default-layout")
