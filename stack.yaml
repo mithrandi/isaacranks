@@ -1,6 +1,6 @@
 flags: {}
 packages:
-- /home/mithrandi/code/isaacranks
+- '.'
 extra-deps:
 - heroku-0.1.2.3
 - yesod-bin-1.5.2.1
