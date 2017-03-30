@@ -2,8 +2,7 @@ module Settings.StaticFiles where
 
 import           Data.Default (def)
 import           Language.Haskell.TH (Q, Exp, Name)
-import           Paths_isaacranks
-import           Prelude (IO, (=<<))
+import           Prelude (IO)
 import           Settings (staticDir)
 import           Settings.Development
 import           Yesod.Static
@@ -14,7 +13,7 @@ staticSite :: IO Static.Static
 staticSite =
   if development
   then Static.staticDevel staticDir
-  else Static.static =<< getDataFileName "static"
+  else Static.static staticDir
 
 -- | This generates easy references to files in the static directory at compile time,
 --   giving you compile-time verification that referenced files exist.
