@@ -14,9 +14,11 @@ getChangesR = selectRep $ do
           [ ( "2017-03-??"
             , [ "The Afterbirth+ update!"
               , "Afterbirth+ voting: the ranks are starting from scratch, as with Afterbirth."
-              , "New ranking algorithm that should perform better than the old ELO-based one."
-              , "Minor visual tweaks"
+              , "Items from the first booster pack are already included; future booster pack items will be added on without a ranking reset, as I do not expect these to significantly impact synergies (whereas Afterbirth and Afterbirth+ introduced significant changes to synergies)."
+              , "New ranking algorithm that should perform better than the old ELO-based one. The new algorithm does not assign any kind of rating, so the columns relating to this have been removed from the Ranks page. The new algorithm has been retroactively applied to the Rebirth and Afterbirth rankings as well."
+              , "Minor visual tweaks."
               , "Vote data export disabled due to limitations with the old export format; please contact me if you're interested in the raw vote data."
+              , "Fixed the images for A Dollar, A Quarter, and Money = Power."
               ]
             )
           , ( "2016-01-24"
