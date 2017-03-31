@@ -137,7 +137,7 @@ executable rebuildranks
                      , transformers
                      , time
 
-    ghc-options:       -threaded -O2 -rtsopts -with-rtsopts=-N
+    ghc-options:       -O2 -rtsopts
 
 executable load-data
     if flag(library-only)
