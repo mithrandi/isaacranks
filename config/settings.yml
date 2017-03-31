@@ -14,5 +14,5 @@ Staging:
   <<: *defaults
 
 Production:
-  approot: "http://www.isaacranks.com"
+  approot: "https://www.isaacranks.com"
   <<: *defaults
