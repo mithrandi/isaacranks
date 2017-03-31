@@ -1,0 +1,29 @@
+{
+  "name": "isaacranks",
+  "description": "Item ranking for The Binding of Isaac",
+  "scripts": {
+  },
+  "env": {
+    "BALLOT_MASKING_KEY": {
+      "generator": "secret"
+    },
+    "YESOD_ENVIRONMENT": {
+      "required": true
+    }
+  },
+  "formation": {
+  },
+  "addons": [
+    "librato",
+    "scheduler",
+    "heroku-postgresql"
+  ],
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-nodejs.git"
+    },
+    {
+      "url": "https://github.com/mfine/heroku-buildpack-stack.git"
+    }
+  ]
+}
