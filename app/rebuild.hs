@@ -1,28 +1,17 @@
 module Main where
 
-import           Control.Monad.Logger (runStdoutLoggingT, filterLogger)
-import           Control.Monad.Trans.Resource (runResourceT)
-import           Data.Time (getCurrentTime)
-import qualified Database.Persist
-import           Database.Persist.Postgresql (createPostgresqlPool, pgConnStr, pgPoolSize)
-import           Helpers.Heroku (herokuConf)
-import           Import hiding (runDB)
-import           System.Environment (lookupEnv)
-import           Vote (reprocessVotes, serializeVotes, uploadDump, storeDump)
-import           Yesod.Default.Config
+import Application (makeFoundation, getAppSettings)
+import Control.Monad.Logger (runLoggingT)
+import Database.Persist.Postgresql (runSqlPool)
+import Import hiding (getArgs)
+import Vote (reprocessVotes, serializeVotes, uploadDump, storeDump)
 
 main :: IO ()
 main = do
-  conf <- Yesod.Default.Config.loadConfig (configSettings Production) { csParseExtra = parseExtra }
-  dbconf <- if development
-           then withYamlEnvironment "config/postgresql.yml" (appEnv conf)
-                Database.Persist.loadConfig >>=
-                Database.Persist.applyEnv
-           else herokuConf
-  pool <- runStdoutLoggingT . filterLogger (\_ LevelDebug -> False)
-         $ createPostgresqlPool (pgConnStr dbconf) (pgPoolSize dbconf)
-  let runDB t = runResourceT $ runStdoutLoggingT $ Database.Persist.runPool dbconf t pool
-  runDB reprocessVotes
+  settings <- getAppSettings
+  foundation <- makeFoundation settings
+  let logFunc = messageLoggerSource foundation (appLogger foundation)
+  runResourceT (runLoggingT (runSqlPool reprocessVotes (appConnPool foundation)) logFunc)
   -- (items, votes) <- runDB reprocessVotes
   -- bucket <- lookupEnv "ISAACRANKS_STATIC_BUCKET_NAME"
   -- case bucket of

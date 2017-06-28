@@ -7,7 +7,6 @@ import           Control.Monad.Logger (LoggingT)
 import           Control.Monad.Trans.Reader (ReaderT)
 import           Data.ByteString.Lens (unpackedChars)
 import           Data.Default (def)
-import           Data.Foldable (for_)
 import qualified Data.Text as T
 import           Data.Text.Lens (unpacked, _Text)
 import           Data.Traversable (for)
@@ -15,7 +14,7 @@ import           Database.Persist.Sql (SqlBackend)
 import           Import
 import           Model.IsaacPool
 import           Model.IsaacVersion
-import           Network.Wreq (responseStatus, statusCode, checkResponse, defaults)
+import qualified Network.Wreq as W
 import qualified Network.Wreq.Session as S
 import qualified Text.XML as XML
 import           Text.XML.Lens (root, el, attr, attributeIs, attributeSatisfies, (./), localName)
@@ -111,16 +110,16 @@ loadData ver itemsPath poolsPath = do
           wikiText :: Text
           wikiText = wikiS ^. from unpacked
       r <- retry 5 $ S.headWith
-        (defaults & checkResponse ?~ \_ _ -> return ())
+        (W.defaults & W.checkResponse ?~ \_ _ -> return ())
         sess
         (wiki ^. to serializeURIRef' . unpackedChars)
-      unless (r ^. responseStatus . statusCode == 200) (print $ "Invalid wiki: " <> wikiText)
+      unless (r ^. W.responseStatus . W.statusCode == 200) (print $ "Invalid wiki: " <> wikiText)
       return
         Item { _itemVersion = ver'
              , _itemIsaacId = iid
              , _itemName = name
              , _itemDescription = desc
-             , _itemWiki = if r ^. responseStatus . statusCode == 200
+             , _itemWiki = if r ^. W.responseStatus . W.statusCode == 200
                            then wikiText else ""
              , _itemRating = 500.1
              , _itemVotes = 0
