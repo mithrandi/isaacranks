@@ -1,0 +1,5 @@
+- Add metrics
+- Set liveness probe to /metrics for the benefit of GCE health checks
+- Set app root to https
+- Set HSTS
+- Maybe provision separate IP address?
