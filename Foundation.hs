@@ -3,6 +3,7 @@ module Foundation where
 import           Database.Persist.Sql (ConnectionPool, runSqlPool)
 import           Import.NoFoundation
 import           Model.IsaacVersion
+import           Network.Wai.Middleware.Prometheus (metricsApp)
 import           Settings.Development (development)
 import           Text.Hamlet (hamletFile)
 import           Text.Jasmine (minifym)
@@ -106,3 +107,6 @@ instance YesodPersistRunner App where
 -- achieve customized and internationalized form validation messages.
 instance RenderMessage App FormMessage where
     renderMessage _ _ = defaultFormMessage
+
+getMetricsSub :: App -> WaiSubsite
+getMetricsSub _ = WaiSubsite metricsApp

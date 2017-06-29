@@ -15,6 +15,7 @@ import           Database.Persist.Postgresql
   ( createPostgresqlPool, pgConnStr, pgPoolSize, runSqlPool)
 import           Database.Persist.Sql (runMigration)
 import           Import
+import           Instrument (requestDuration, instrumentApp)
 import           Language.Haskell.TH.Syntax (qLocation)
 import           Network.HTTP.Client.Conduit (newManager)
 import           Network.Wai (Middleware)
@@ -28,6 +29,8 @@ import           Network.Wai.Middleware.RequestLogger
     ( mkRequestLogger, outputFormat, OutputFormat (..), IPAddrSource (..), destination
     )
 import qualified Network.Wai.Middleware.RequestLogger as RequestLogger
+import           Prometheus
+import           Prometheus.Metric.GHC (ghcMetrics)
 import           System.Environment (getEnv)
 import           System.Log.FastLogger (newStdoutLoggerSet, defaultBufSize, toLogStr)
 import qualified Web.ClientSession as WS
@@ -90,17 +93,22 @@ makeApplication foundation = do
     return $ logWare . myMiddlewares $ appPlain
 
 makeLogWare :: App -> IO Middleware
-makeLogWare foundation =
-    mkRequestLogger def
-        { outputFormat =
-            if appDetailedRequestLogging $ appSettings foundation
-                then Detailed True
-                else Apache
-                        (if appIpFromHeader $ appSettings foundation
-                            then FromFallback
-                            else FromSocket)
-        , destination = RequestLogger.Logger $ loggerSet $ appLogger foundation
-        }
+makeLogWare foundation = do
+  requests <- Prometheus.registerIO requestDuration
+  void $ Prometheus.register ghcMetrics
+  logger <- mkRequestLogger def
+    { outputFormat =
+        if appDetailedRequestLogging $ appSettings foundation
+        then Detailed True
+        else Apache
+             (if appIpFromHeader $ appSettings foundation
+               then FromFallback
+               else FromSocket)
+    , destination = RequestLogger.Logger $ loggerSet $ appLogger foundation
+    }
+  let instrument = instrumentApp requests "isaacranks"
+  return $ logger . instrument
+
 
 -- | Warp settings for the given foundation value.
 warpSettings :: App -> Settings

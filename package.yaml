@@ -30,6 +30,7 @@ library:
   - Foundation
   - Import
   - Import.NoFoundation
+  - Instrument
   - Items
   - Model
   - Model.IsaacVersion
@@ -54,6 +55,7 @@ library:
   - bytestring >=0.9 && <0.11
   - classy-prelude-yesod
   - clientsession
+  - clock
   - conduit >=1.0 && <2.0
   - conduit-combinators
   - containers
@@ -73,6 +75,8 @@ library:
   - persistent >=2.0 && <2.7
   - persistent-postgresql >=2.0 && <2.7
   - persistent-template >=2.0 && <2.7
+  - prometheus-client
+  - prometheus-metrics-ghc
   - random
   - random-shuffle
   - shakespeare >=2.0 && <2.1
@@ -84,6 +88,7 @@ library:
   - wai
   - wai-extra >=3.0 && <3.1
   - wai-logger >=2.2 && <2.4
+  - wai-middleware-prometheus
   - warp >=3.0 && <3.3
   - wreq >=0.4 && <0.6
   - xml-conduit
