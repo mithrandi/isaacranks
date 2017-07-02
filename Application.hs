@@ -2,6 +2,7 @@
 module Application
     ( getApplicationDev
     , appMain
+    , rebuildMain
     , develMain
     , makeFoundation
     , getAppSettings
@@ -11,6 +12,7 @@ import           Control.Monad.Logger (liftLoc, runLoggingT)
 import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Char8 as BC
 import           Data.Default (def)
+import           Data.Text.Read (decimal)
 import           Database.Persist.Postgresql
   ( createPostgresqlPool, pgConnStr, pgPoolSize, runSqlPool)
 import           Database.Persist.Sql (runMigration)
@@ -25,6 +27,7 @@ import           Network.Wai.Handler.Warp
   )
 import           Network.Wai.Middleware.Autohead (autohead)
 import           Network.Wai.Middleware.Gzip (gzip, gzipFiles, GzipFiles(GzipCompress))
+import           Network.Wai.Middleware.Prometheus (metricsApp)
 import           Network.Wai.Middleware.RequestLogger
     ( mkRequestLogger, outputFormat, OutputFormat (..), IPAddrSource (..), destination
     )
@@ -34,6 +37,8 @@ import           Prometheus.Metric.GHC (ghcMetrics)
 import           System.Environment (getEnv)
 import           System.Log.FastLogger (newStdoutLoggerSet, defaultBufSize, toLogStr)
 import qualified Web.ClientSession as WS
+
+import           Vote (reprocessVotes)
 
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
@@ -160,3 +165,25 @@ appMain = do
 
     -- Run the application with Warp
     runSettings (warpSettings foundation) app
+
+
+rebuildMain :: IO ()
+rebuildMain = do
+  [intervalS] <- getArgs
+  let interval = either (const 0) fst (decimal intervalS)
+  settings <- getAppSettings
+  foundation <- makeFoundation settings
+  let logFunc = messageLoggerSource foundation (appLogger foundation)
+      runDB d = runResourceT (runLoggingT (runSqlPool d (appConnPool foundation)) logFunc)
+  fork $ runSettings (warpSettings foundation) metricsApp
+  if interval == 0
+    then runDB reprocessVotes
+    else forever $ threadDelay interval >> runDB reprocessVotes
+  -- (items, votes) <- runDB reprocessVotes
+  -- bucket <- lookupEnv "ISAACRANKS_STATIC_BUCKET_NAME"
+  -- case bucket of
+  --   Just _ -> do
+  --     (bucketName, name) <- uploadDump (serializeVotes items votes)
+  --     timestamp <- getCurrentTime
+  --     runDB $ storeDump bucketName name timestamp
+  --   Nothing -> return ()
