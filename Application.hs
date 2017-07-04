@@ -8,7 +8,7 @@ module Application
     , getAppSettings
     ) where
 
-import           Control.Monad.Logger (liftLoc, runLoggingT)
+import           Control.Monad.Logger (liftLoc, runLoggingT, logInfo)
 import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Char8 as BC
 import           Data.Default (def)
@@ -174,11 +174,15 @@ rebuildMain = do
   settings <- getAppSettings
   foundation <- makeFoundation settings
   let logFunc = messageLoggerSource foundation (appLogger foundation)
-      runDB d = runResourceT (runLoggingT (runSqlPool d (appConnPool foundation)) logFunc)
-  fork $ runSettings (warpSettings foundation) metricsApp
+      run d = runResourceT (runLoggingT (runSqlPool d (appConnPool foundation)) logFunc)
+      reprocess = run $ do
+        $(logInfo) "Starting rebuild…"
+        reprocessVotes
+        $(logInfo) "Rebuild complete."
+  void $ fork $ runSettings (warpSettings foundation) metricsApp
   if interval == 0
-    then runDB reprocessVotes
-    else forever $ threadDelay interval >> runDB reprocessVotes
+    then reprocess
+    else forever $ threadDelay (interval * 1000000) >> reprocess
   -- (items, votes) <- runDB reprocessVotes
   -- bucket <- lookupEnv "ISAACRANKS_STATIC_BUCKET_NAME"
   -- case bucket of
