@@ -11,9 +11,7 @@ import           Data.Binary.Get (runGet, getWord32be)
 import           Data.Binary.Put (runPut, putWord32be)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
-import           Data.ByteString.Lazy (toStrict, fromStrict)
 import qualified Data.ByteString.Lazy as LBS
-import           Data.List (sortOn)
 import qualified Data.Map.Strict as M
 import           Data.Maybe (fromMaybe)
 import qualified Data.Text as T
@@ -141,13 +139,13 @@ validTime = 3600
 
 encryptBallot :: UTCTime -> Int -> Int -> Handler Text
 encryptBallot now winner loser = do
-  key <- ballotKey <$> getYesod
+  key <- appBallotKey <$> getYesod
   out <- liftIO $ WS.encryptIO key (encodeBallot (validTime `addUTCTime` now) winner loser)
   return . T.pack . BC.unpack $ out
 
 decryptBallot :: UTCTime -> Text -> Handler (Int, Int)
 decryptBallot now b = do
-  key <- ballotKey <$> getYesod
+  key <- appBallotKey <$> getYesod
   let Just b' = WS.decrypt key (BC.pack . T.unpack $ b)
       (expiry, winner, loser) = decodeBallot b'
   if expiry < now

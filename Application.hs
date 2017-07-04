@@ -1,40 +1,48 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Application
-    ( makeApplication
-    , getApplicationDev
+    ( getApplicationDev
+    , appMain
+    , rebuildMain
+    , develMain
     , makeFoundation
+    , getAppSettings
     ) where
 
-import           Control.Monad.Logger (runLoggingT)
+import           Control.Monad.Logger (liftLoc, runLoggingT, logInfo)
 import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Char8 as BC
 import           Data.Default (def)
-import qualified Database.Persist
-import           Database.Persist.Postgresql (createPostgresqlPool, pgConnStr, pgPoolSize)
+import           Data.Text.Read (decimal)
+import           Database.Persist.Postgresql
+  ( createPostgresqlPool, pgConnStr, pgPoolSize, runSqlPool)
 import           Database.Persist.Sql (runMigration)
-import           Helpers.Heroku (herokuConf)
 import           Import
+import           Instrument (requestDuration, instrumentApp)
+import           Language.Haskell.TH.Syntax (qLocation)
 import           Network.HTTP.Client.Conduit (newManager)
 import           Network.Wai (Middleware)
-import           Network.Wai.Logger (clockDateCacher)
-import           Network.Wai.Middleware.AcceptOverride (acceptOverride)
+import           Network.Wai.Handler.Warp
+  ( Settings, defaultSettings, defaultShouldDisplayException, runSettings
+  , setHost, setOnException, setPort
+  )
 import           Network.Wai.Middleware.Autohead (autohead)
 import           Network.Wai.Middleware.Gzip (gzip, gzipFiles, GzipFiles(GzipCompress))
-import           Network.Wai.Middleware.MethodOverride (methodOverride)
+import           Network.Wai.Middleware.Prometheus (metricsApp)
 import           Network.Wai.Middleware.RequestLogger
     ( mkRequestLogger, outputFormat, OutputFormat (..), IPAddrSource (..), destination
     )
 import qualified Network.Wai.Middleware.RequestLogger as RequestLogger
+import           Prometheus
+import           Prometheus.Metric.GHC (ghcMetrics)
 import           System.Environment (getEnv)
-import           System.Log.FastLogger (newStdoutLoggerSet, defaultBufSize)
+import           System.Log.FastLogger (newStdoutLoggerSet, defaultBufSize, toLogStr)
 import qualified Web.ClientSession as WS
-import           Yesod.Core.Types (loggerSet, Logger (Logger))
-import           Yesod.Default.Config
-import           Yesod.Default.Handlers
-import           Yesod.Default.Main
+
+import           Vote (reprocessVotes)
 
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
+import           Handler.Common
 import           Handler.Home
 import           Handler.Vote
 import           Handler.Ranks
@@ -47,82 +55,139 @@ import           Handler.Changes
 mkYesodDispatch "App" resourcesApp
 
 myMiddlewares :: Middleware
-myMiddlewares = acceptOverride
-                . autohead
-                . gzip def {gzipFiles = GzipCompress}
-                . methodOverride
+myMiddlewares = autohead . gzip def {gzipFiles = GzipCompress}
 
--- This function allocates resources (such as a database connection pool),
--- performs initialization and creates a WAI application. This is also the
--- place to put your migrate statements to have automatic database
--- migrations handled by Yesod.
-makeApplication :: AppConfig DefaultEnv Extra -> IO (Application, LogFunc)
-makeApplication conf = do
-    foundation <- makeFoundation conf
+makeFoundation :: AppSettings -> IO App
+makeFoundation appSettings = do
+    -- Some basic initializations: HTTP connection manager, logger, and static
+    -- subsite.
+    appHttpManager <- newManager
+    appLogger <- newStdoutLoggerSet defaultBufSize >>= makeYesodLogger
+    let appStatic = myStatic
 
-    -- Initialize the logging middleware
-    logWare <- mkRequestLogger def
-        { outputFormat =
-            if development
-                then Detailed True
-                else Apache FromSocket
-        , destination = RequestLogger.Logger $ loggerSet $ appLogger foundation
-        }
-
-    -- Create the WAI application and apply middlewares
-    app <- toWaiAppPlain foundation
-    let logFunc = messageLoggerSource foundation (appLogger foundation)
-    return (logWare $ myMiddlewares app, logFunc)
-
-
--- | Loads up any necessary settings, creates your foundation datatype, and
--- performs some initialization.
-makeFoundation :: AppConfig DefaultEnv Extra -> IO App
-makeFoundation conf = do
-    manager <- newManager
-    s <- staticSite
-    dbconf <- if development
-             then withYamlEnvironment "config/postgresql.yml" (appEnv conf)
-                  Database.Persist.loadConfig >>=
-                  Database.Persist.applyEnv
-             else herokuConf
-
-    loggerSet' <- newStdoutLoggerSet defaultBufSize
-    (getter, _) <- clockDateCacher
-
-    key <- do
+    appBallotKey <- do
         Right key64 <- B64.decode . BC.pack <$> getEnv "BALLOT_MASKING_KEY"
         let Right key = WS.initKey key64
         return key
 
-    let logger = Yesod.Core.Types.Logger loggerSet' getter
-        mkFoundation p = App
-            { settings = conf
-            , getStatic = s
-            , connPool = p
-            , httpManager = manager
-            , persistConfig = dbconf
-            , appLogger = logger
-            , ballotKey = key
-            }
+    -- We need a log function to create a connection pool. We need a connection
+    -- pool to create our foundation. And we need our foundation to get a
+    -- logging function. To get out of this loop, we initially create a
+    -- temporary foundation without a real connection pool, get a log function
+    -- from there, and then create the real foundation.
+    let mkFoundation appConnPool = App {..}
         tempFoundation = mkFoundation $ error "connPool forced in tempFoundation"
-        logFunc = messageLoggerSource tempFoundation logger
+        logFunc = messageLoggerSource tempFoundation appLogger
 
-    p <- flip runLoggingT logFunc
-       $ createPostgresqlPool (pgConnStr dbconf) (pgPoolSize dbconf)
-    let foundation = mkFoundation p
+    -- Create the database connection pool
+    pool <- flip runLoggingT logFunc $ createPostgresqlPool
+        (pgConnStr  $ appDatabaseConf appSettings)
+        (pgPoolSize $ appDatabaseConf appSettings)
 
     -- Perform database migration using our application's logging settings.
-    flip runLoggingT logFunc
-        (Database.Persist.runPool dbconf (runMigration migrateAll) p)
+    runLoggingT (runSqlPool (runMigration migrateAll) pool) logFunc
 
-    return foundation
+    -- Return the foundation
+    return $ mkFoundation pool
 
--- for yesod devel
-getApplicationDev :: IO (Int, Application)
-getApplicationDev =
-    defaultDevelApp loader (fmap fst . makeApplication)
-  where
-    loader = Yesod.Default.Config.loadConfig (configSettings Development)
-        { csParseExtra = parseExtra
-        }
+makeApplication :: App -> IO Application
+makeApplication foundation = do
+    logWare <- makeLogWare foundation
+    -- Create the WAI application and apply middlewares
+    appPlain <- toWaiAppPlain foundation
+    return $ logWare . myMiddlewares $ appPlain
+
+makeLogWare :: App -> IO Middleware
+makeLogWare foundation = do
+  requests <- Prometheus.registerIO requestDuration
+  void $ Prometheus.register ghcMetrics
+  logger <- mkRequestLogger def
+    { outputFormat =
+        if appDetailedRequestLogging $ appSettings foundation
+        then Detailed True
+        else Apache
+             (if appIpFromHeader $ appSettings foundation
+               then FromFallback
+               else FromSocket)
+    , destination = RequestLogger.Logger $ loggerSet $ appLogger foundation
+    }
+  let instrument = instrumentApp requests "isaacranks"
+  return $ logger . instrument
+
+
+-- | Warp settings for the given foundation value.
+warpSettings :: App -> Settings
+warpSettings foundation =
+      setPort (appPort $ appSettings foundation)
+    $ setHost (appHost $ appSettings foundation)
+    $ setOnException (\_req e ->
+        when (defaultShouldDisplayException e) $ messageLoggerSource
+            foundation
+            (appLogger foundation)
+            $(qLocation >>= liftLoc)
+            "yesod"
+            LevelError
+            (toLogStr $ "Exception from Warp: " ++ show e))
+      defaultSettings
+
+-- | For yesod devel, return the Warp settings and WAI Application.
+getApplicationDev :: IO (Settings, Application)
+getApplicationDev = do
+    settings <- getAppSettings
+    foundation <- makeFoundation settings
+    wsettings <- getDevSettings $ warpSettings foundation
+    app <- makeApplication foundation
+    return (wsettings, app)
+
+getAppSettings :: IO AppSettings
+getAppSettings = loadYamlSettings [configSettingsYml] [] useEnv
+
+-- | main function for use by yesod devel
+develMain :: IO ()
+develMain = develMainHelper getApplicationDev
+
+-- | The @main@ function for an executable running this site.
+appMain :: IO ()
+appMain = do
+    -- Get the settings from all relevant sources
+    settings <- loadYamlSettingsArgs
+        -- fall back to compile-time values, set to [] to require values at runtime
+        [configSettingsYmlValue]
+
+        -- allow environment variables to override
+        useEnv
+
+    -- Generate the foundation from the settings
+    foundation <- makeFoundation settings
+
+    -- Generate a WAI Application from the foundation
+    app <- makeApplication foundation
+
+    -- Run the application with Warp
+    runSettings (warpSettings foundation) app
+
+
+rebuildMain :: IO ()
+rebuildMain = do
+  [intervalS] <- getArgs
+  let interval = either (const 0) fst (decimal intervalS)
+  settings <- getAppSettings
+  foundation <- makeFoundation settings
+  let logFunc = messageLoggerSource foundation (appLogger foundation)
+      run d = runResourceT (runLoggingT (runSqlPool d (appConnPool foundation)) logFunc)
+      reprocess = run $ do
+        $(logInfo) "Starting rebuild…"
+        reprocessVotes
+        $(logInfo) "Rebuild complete."
+  void $ fork $ runSettings (warpSettings foundation) metricsApp
+  if interval == 0
+    then reprocess
+    else forever $ threadDelay (interval * 1000000) >> reprocess
+  -- (items, votes) <- runDB reprocessVotes
+  -- bucket <- lookupEnv "ISAACRANKS_STATIC_BUCKET_NAME"
+  -- case bucket of
+  --   Just _ -> do
+  --     (bucketName, name) <- uploadDump (serializeVotes items votes)
+  --     timestamp <- getCurrentTime
+  --     runDB $ storeDump bucketName name timestamp
+  --   Nothing -> return ()

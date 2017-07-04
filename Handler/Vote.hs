@@ -1,14 +1,13 @@
 module Handler.Vote where
 
 import qualified Data.ByteString.Char8 as BC
-import           Data.List (last)
 import           Data.Maybe
 import qualified Data.Text as T
 import           Data.Time (getCurrentTime)
 import qualified Database.Esqueleto as E
 import           Import
 import           Model.IsaacVersion
-import           Network.Wai (requestHeaders, remoteHost)
+import qualified Network.Wai as Wai
 import           System.Random (newStdGen)
 import           System.Random.Shuffle (shuffle')
 import           Vote (processVote, encryptBallot, decryptBallot)
@@ -43,10 +42,10 @@ getVoteR ver = do
 postVoteR :: IsaacVersion -> Handler TypedContent
 postVoteR ver = do
   request <- waiRequest
-  let value = T.pack . BC.unpack <$> lookup "X-Forwarded-For" (requestHeaders request)
+  let value = T.pack . BC.unpack <$> lookup "X-Forwarded-For" (Wai.requestHeaders request)
       voter = maybe
-              (T.pack . show $ remoteHost request)
-              (T.stripStart . T.stripEnd . last . T.splitOn ",")
+              (T.pack . show $ Wai.remoteHost request)
+              (T.stripStart . T.stripEnd . unsafeLast . T.splitOn ",")
               value
   ballot <- runInputPost $ ireq textField "ballot"
   timestamp <- lift getCurrentTime

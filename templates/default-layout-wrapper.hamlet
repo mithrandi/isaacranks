@@ -1,6 +1,6 @@
 $newline never
 \<!doctype html>
-<html class="no-js" lang="en"> <!--<![endif]-->
+<html lang="en">
     <head>
         <meta charset="UTF-8">
 
@@ -67,7 +67,7 @@ $newline never
                 <a href="https://www.reddit.com/r/isaacranks">/r/isaacranks
                 \!
 
-        $maybe analytics <- extraAnalytics $ appExtra $ settings master
+        $maybe analytics <- appAnalytics $ appSettings master
             <script>
               if(!window.location.href.match(/localhost/)){
                 window._gaq = [['_setAccount','#{analytics}'],['_trackPageview'],['_trackPageLoadTime']];
