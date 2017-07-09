@@ -139,13 +139,13 @@ validTime = 3600
 
 encryptBallot :: UTCTime -> Int -> Int -> Handler Text
 encryptBallot now winner loser = do
-  key <- appBallotKey <$> getYesod
+  key <- asks appBallotKey
   out <- liftIO $ WS.encryptIO key (encodeBallot (validTime `addUTCTime` now) winner loser)
   return . T.pack . BC.unpack $ out
 
 decryptBallot :: UTCTime -> Text -> Handler (Int, Int)
 decryptBallot now b = do
-  key <- appBallotKey <$> getYesod
+  key <- asks appBallotKey
   let Just b' = WS.decrypt key (BC.pack . T.unpack $ b)
       (expiry, winner, loser) = decodeBallot b'
   if expiry < now

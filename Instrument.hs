@@ -1,9 +1,14 @@
 module Instrument
   ( requestDuration
   , instrumentApp
+  , observeDuration
+  , observeDurationL
+  , observeHandler
+  , observeHandlerL
   ) where
 
 import qualified Data.ByteString.Char8 as B8
+import           Data.Ratio ((%))
 import qualified Data.Text as T
 import           Import
 import qualified Network.HTTP.Types as HTTP
@@ -20,11 +25,11 @@ import qualified System.Clock as Clock
 -- * status_code: the HTTP response code
 --
 -- Actual metric is the latency of the request.
-type RequestDuration = Prom.Metric (Prom.Vector Prom.Label3 Prom.Summary)
+type RequestDuration = Prom.Metric (Prom.Vector Prom.Label3 Prom.Histogram)
 
 requestDuration :: IO RequestDuration
 requestDuration =
-  Prom.vector ("handler", "method", "status_code") $ Prom.summary info Prom.defaultQuantiles
+  Prom.vector ("handler", "method", "status_code") $ Prom.histogram info Prom.defaultBuckets
   where
     info =
       Prom.Info
@@ -54,3 +59,45 @@ instrumentApp metric handler app req resp = do
       where
         method = B8.unpack (Wai.requestMethod req)
         status = show statusCode
+
+
+-- | Lifted version of 'Prometheus.observeDuration'
+observeDuration ::
+  (MonadIO m, Prom.Observer metric) => Prom.Metric metric -> m a -> m a
+observeDuration metric io = do
+    (result, duration) <- timeAction io
+    liftIO $ Prom.observe duration metric
+    return result
+
+
+observeDurationL ::
+  (MonadIO m, Prom.Observer metric, Prom.Label l) =>
+  Prom.Metric (Prom.Vector l metric) -> l -> m a -> m a
+observeDurationL metric label io = do
+    (result, duration) <- timeAction io
+    liftIO $ Prom.withLabel label (Prom.observe duration) metric
+    return result
+
+
+-- | Lifted version of 'Prometheus.timeAction'
+timeAction :: MonadIO m => m a -> m (a, Double)
+timeAction io = do
+    start  <- liftIO $ Clock.getTime Clock.Monotonic
+    result <- io
+    end    <- liftIO $ Clock.getTime Clock.Monotonic
+    let duration = Clock.toNanoSecs (end `Clock.diffTimeSpec` start) % 1000000000
+    return (result, fromRational duration)
+
+
+observeHandler ::
+  (Prom.Observer metric, MonadIO m, MonadReader App m) =>
+  (AppMetrics -> Prom.Metric metric) -> m b -> m b
+observeHandler m h = asks (m . appMetrics) >>= flip observeDuration h
+
+
+observeHandlerL ::
+  (Prom.Observer metric, Prom.Label l, MonadIO m, MonadReader App m) =>
+  (AppMetrics -> Prom.Metric (Prom.Vector l metric)) -> l -> m b -> m b
+observeHandlerL m label h = do
+  metric <- asks (m . appMetrics)
+  observeDurationL metric label h
