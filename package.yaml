@@ -1,5 +1,5 @@
 name: isaacranks
-version: '1.0.2'
+version: '1.0.3'
 license: MIT
 dependencies:
 - resourcet
@@ -121,7 +121,7 @@ executables:
     - -threaded
     - -O2
     - -rtsopts
-    - -with-rtsopts=-N
+    - '"-with-rtsopts=-N -T"'
     dependencies:
     - base
     - isaacranks
@@ -140,7 +140,7 @@ executables:
     - -threaded
     - -O2
     - -rtsopts
-    - -with-rtsopts=-N
+    - '"-with-rtsopts=-N -T"'
     dependencies:
     - base
     - isaacranks
@@ -155,7 +155,7 @@ executables:
     - -threaded
     - -O2
     - -rtsopts
-    - -with-rtsopts=-N
+    - '"-with-rtsopts=-N -T"'
     dependencies:
     - base
     - isaacranks
