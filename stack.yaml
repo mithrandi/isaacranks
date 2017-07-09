@@ -1,4 +1,6 @@
 flags: {}
 packages:
-- '.'
+  - '.'
+extra-deps:
+  - prometheus-client-0.2.0
 resolver: lts-8.20

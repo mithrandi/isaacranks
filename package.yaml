@@ -75,7 +75,7 @@ library:
   - persistent >=2.0 && <2.7
   - persistent-postgresql >=2.0 && <2.7
   - persistent-template >=2.0 && <2.7
-  - prometheus-client
+  - prometheus-client >= 0.2.0
   - prometheus-metrics-ghc
   - random
   - random-shuffle
