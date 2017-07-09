@@ -4,6 +4,7 @@ import           Database.Persist.Sql (ConnectionPool, runSqlPool)
 import           Import.NoFoundation
 import           Model.IsaacVersion
 import           Network.Wai.Middleware.Prometheus (metricsApp)
+import qualified Prometheus as P
 import           Settings.Development (development)
 import           Text.Hamlet (hamletFile)
 import           Text.Jasmine (minifym)
@@ -11,10 +12,11 @@ import qualified Web.ClientSession as WC
 import           Yesod.Core.Types (Logger)
 import           Yesod.EmbeddedStatic (EmbeddedStatic, embedStaticContent)
 
--- | The site argument for your application. This can be a good place to
--- keep settings and values requiring initialization before your application
--- starts running, such as database connections. Every handler will have
--- access to the data present here.
+data AppMetrics = AppMetrics
+  { metricBallots :: P.Metric (P.Vector P.Label1 P.Histogram)
+  , metricVotes   :: P.Metric (P.Vector P.Label1 P.Histogram)
+  }
+
 data App = App
   { appSettings    :: AppSettings
   , appStatic      :: EmbeddedStatic -- ^ Settings for static file serving.
@@ -22,6 +24,7 @@ data App = App
   , appHttpManager :: Manager
   , appLogger      :: Logger
   , appBallotKey   :: WC.Key
+  , appMetrics     :: AppMetrics
   }
 
 instance HasHttpManager App where

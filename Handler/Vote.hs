@@ -6,6 +6,7 @@ import qualified Data.Text as T
 import           Data.Time (getCurrentTime)
 import qualified Database.Esqueleto as E
 import           Import
+import           Instrument (observeHandlerL)
 import           Model.IsaacVersion
 import qualified Network.Wai as Wai
 import           System.Random (newStdGen)
@@ -13,7 +14,7 @@ import           System.Random.Shuffle (shuffle')
 import           Vote (processVote, encryptBallot, decryptBallot)
 
 getVoteR :: IsaacVersion -> Handler TypedContent
-getVoteR ver = do
+getVoteR ver = observeHandlerL metricBallots (show ver) $ do
   items <- runDB $ E.select $ E.from $ \item -> do
     E.where_ $ item E.^. ItemVersion E.==. E.val ver
     return $ item E.^. ItemIsaacId
@@ -40,7 +41,7 @@ getVoteR ver = do
     provideJson ballotJson
 
 postVoteR :: IsaacVersion -> Handler TypedContent
-postVoteR ver = do
+postVoteR ver = observeHandlerL metricVotes (show ver) $ do
   request <- waiRequest
   let value = T.pack . BC.unpack <$> lookup "X-Forwarded-For" (Wai.requestHeaders request)
       voter = maybe

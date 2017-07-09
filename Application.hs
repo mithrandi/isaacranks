@@ -70,6 +70,13 @@ makeFoundation appSettings = do
         let Right key = WS.initKey key64
         return key
 
+    appMetrics <- do
+      metricBallots <- registerIO $ vector ("version" :: String) $
+        histogram (Info "isaacranks_ballot_generation_seconds" "Ballot generation time in seconds.") defaultBuckets
+      metricVotes <- registerIO $ vector ("version" :: String) $
+        histogram (Info "isaacranks_vote_casting_seconds" "Vote casting time in seconds.") defaultBuckets
+      return AppMetrics {..}
+
     -- We need a log function to create a connection pool. We need a connection
     -- pool to create our foundation. And we need our foundation to get a
     -- logging function. To get out of this loop, we initially create a
