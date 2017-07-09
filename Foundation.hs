@@ -13,8 +13,10 @@ import           Yesod.Core.Types (Logger)
 import           Yesod.EmbeddedStatic (EmbeddedStatic, embedStaticContent)
 
 data AppMetrics = AppMetrics
-  { metricBallots :: P.Metric (P.Vector P.Label1 P.Histogram)
-  , metricVotes   :: P.Metric (P.Vector P.Label1 P.Histogram)
+  { metricBallots             :: P.Metric (P.Vector P.Label1 P.Histogram)
+  , metricVotes               :: P.Metric (P.Vector P.Label1 P.Histogram)
+  , metricLastRebuild         :: P.Metric P.Gauge
+  , metricRebuildDuration     :: P.Metric P.Gauge
   }
 
 data App = App

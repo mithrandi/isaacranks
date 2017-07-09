@@ -5,6 +5,7 @@ module Instrument
   , observeDurationL
   , observeHandler
   , observeHandlerL
+  , timeAction
   ) where
 
 import qualified Data.ByteString.Char8 as B8
