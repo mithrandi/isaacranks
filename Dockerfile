@@ -1,8 +1,9 @@
 FROM node:8.2.1 as client
-COPY ["package.json", "/src/"]
-COPY ["js/", "/src/js"]
+COPY ["package.json", "yarn.lock", "/src/"]
 WORKDIR /src
-RUN yarn install --frozen-lockfile && yarn run build
+RUN yarn install --frozen-lockfile
+COPY ["js/", "/src/js"]
+RUN yarn run build
 
 FROM fpco/stack-build:lts-8.20 as server
 COPY ["stack.yaml", "/src/"]
