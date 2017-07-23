@@ -11,7 +11,7 @@ getChangesR = selectRep $ do
   provideJson changes
   where changes :: [(Text, [Text])]
         changes =
-          [ ( "2017-07-??"
+          [ ( "2017-07-23"
             , [ "The Booster Pack #3 update"
               , "Items from Booster Packs #2 and #3 have been added for Afterbirth+."
               , "Fixed wiki links for all Afterbirth+ items (some were broken due to changes in page titles)."
