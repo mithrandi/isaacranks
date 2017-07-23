@@ -24,6 +24,7 @@ getVoteR ver = observeHandlerL metricBallots (show ver) $ do
                   (,) <$> getBy (UniqueItem ver leftId)
                       <*> getBy (UniqueItem ver rightId)
   alreadyExpired
+  addHeader "Cache-Control" "private, no-cache, must-revalidate"
   timestamp <- lift getCurrentTime
   ballotLeft <- encryptBallot timestamp leftId rightId
   ballotRight <- encryptBallot timestamp rightId leftId

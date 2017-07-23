@@ -6,11 +6,8 @@
 .cabal-sandbox
 .hsenv*
 .stack-work/
-cabal-dev/
-cabal.sandbox.config
 config/client_session_key.aes
 dist*
-docker/
 isaacranks.cabal
 node_modules/
 static/combined/

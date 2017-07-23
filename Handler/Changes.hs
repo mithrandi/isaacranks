@@ -11,7 +11,13 @@ getChangesR = selectRep $ do
   provideJson changes
   where changes :: [(Text, [Text])]
         changes =
-          [ ( "2017-03-31"
+          [ ( "2017-07-??"
+            , [ "The Booster Pack #3 update"
+              , "Items from Booster Packs #2 and #3 have been added for Afterbirth+."
+              , "Fixed wiki links for all Afterbirth+ items (some were broken due to changes in page titles)."
+              ]
+            )
+          , ( "2017-03-31"
             , [ "The Afterbirth+ update!"
               , "Afterbirth+ voting: the ranks are starting from scratch, as with Afterbirth."
               , "Items from the first booster pack are already included; future booster pack items will be added on without a ranking reset, as I do not expect these to significantly impact synergies (whereas Afterbirth and Afterbirth+ introduced significant changes to synergies)."

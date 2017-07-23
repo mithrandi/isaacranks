@@ -73,11 +73,7 @@ instance Yesod App where
         -- you to use normal widget features in default-layout.
 
         pc <- widgetToPageContent $ do
-            addStylesheetRemote "https://static.isaacranks.com/styles/bootstrap-3.3.5"
-            addStylesheetRemote "https://static.isaacranks.com/styles/bootstrap-theme-3.3.5"
-            addStylesheetRemote "https://static.isaacranks.com/styles/icons-4"
-            addStylesheetRemote "https://static.isaacranks.com/fa-4.4.0/styles/font-awesome"
-            addStylesheet $ StaticR css_isaacranks_css
+            addStylesheet $ StaticR css_app_css
             $(widgetFile "default-layout")
         withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 

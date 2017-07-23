@@ -1,3 +1,8 @@
 .git/
 .stack-work/
+dist/
+isaacranks.cabal
 node_modules/
+static/js/
+yesod-devel
+Dockerfile
