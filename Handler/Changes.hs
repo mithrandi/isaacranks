@@ -12,9 +12,9 @@ getChangesR = selectRep $ do
   where changes :: [(Text, [Text])]
         changes =
           [ ( "2017-07-??"
-            , [ "The Booster Pack 3 update"
-              , "Items from Booster Packs 2 and 3 have been added for Afterbirth+."
-              , "Some changes in how and where the site is hosted were made; users shouldn't notice anything different, other than perhaps things being a little faster."
+            , [ "The Booster Pack #3 update"
+              , "Items from Booster Packs #2 and #3 have been added for Afterbirth+."
+              , "Fixed wiki links for all Afterbirth+ items (some were broken due to changes in page titles)."
               ]
             )
           , ( "2017-03-31"
