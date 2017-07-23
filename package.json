@@ -9,8 +9,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --display-error-details --config js/webpack.config.js --env production --optimize-minimize --define process.env.NODE_ENV=\"'production'\"",
-    "watch": "webpack --progress --colors --watch --config js/webpack.config.js --env development",
-    "heroku-postbuild": "yarn run build"
+    "watch": "webpack --progress --colors --watch --config js/webpack.config.js --env development"
   },
   "author": "",
   "license": "ISC",
