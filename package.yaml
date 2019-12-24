@@ -1,5 +1,5 @@
 name: isaacranks
-version: '1.0.4'
+version: '1.0.7'
 license: MIT
 dependencies:
 - resourcet
