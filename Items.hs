@@ -57,7 +57,6 @@ wikiName name iid = case name of
     121 -> "Odd_Mushroom_(Large)"
     _ -> ""
   "PHD" -> "PHD"
-  "A Pony" -> "The_Pony"
   "IV Bag" -> "IV_Bag"
   "Tooth Picks" -> "Toothpicks"
   "Guppy's Hairball" -> "Guppy's_Hair_Ball"
