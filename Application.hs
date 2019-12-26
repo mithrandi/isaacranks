@@ -8,6 +8,7 @@ module Application
     , getAppSettings
     ) where
 
+import           Control.Concurrent
 import           Control.Monad.Logger (liftLoc, runLoggingT, logInfo)
 import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Char8 as BC
@@ -72,13 +73,13 @@ makeFoundation appSettings = do
         return key
 
     appMetrics <- do
-      metricBallots <- registerIO $ vector ("version" :: String) $
+      metricBallots <- register $ vector "version" $
         histogram (Info "isaacranks_ballot_generation_seconds" "Ballot generation time in seconds.") defaultBuckets
-      metricVotes <- registerIO $ vector ("version" :: String) $
+      metricVotes <- register $ vector "version" $
         histogram (Info "isaacranks_vote_casting_seconds" "Vote casting time in seconds.") defaultBuckets
-      metricLastRebuild <- registerIO $
+      metricLastRebuild <- register $
         gauge (Info "isaacranks_last_rebuild_timestamp" "Timestamp of last ranks rebuild.")
-      metricRebuildDuration <- registerIO $
+      metricRebuildDuration <- register $
         gauge (Info "isaacranks_last_rebuild_duration_seconds" "Duration of last ranks rebuild in seconds.")
       return AppMetrics {..}
 
@@ -111,7 +112,7 @@ makeApplication foundation = do
 
 makeLogWare :: App -> IO Middleware
 makeLogWare foundation = do
-  requests <- Prometheus.registerIO requestDuration
+  requests <- requestDuration
   void $ Prometheus.register ghcMetrics
   logger <- mkRequestLogger def
     { outputFormat =
@@ -191,7 +192,7 @@ rebuildMain = do
         reprocess (metricLastRebuild . appMetrics $ foundation)
                   (metricRebuildDuration . appMetrics $ foundation)
   void $ Prometheus.register ghcMetrics
-  void $ fork $ runSettings (warpSettings foundation) metricsApp
+  void $ forkIO $ runSettings (warpSettings foundation) metricsApp
   if interval == 0
     then reprocess'
     else forever $ threadDelay (interval * 1000000) >> reprocess'
@@ -199,8 +200,8 @@ rebuildMain = do
           $(logInfo) "Starting rebuild…"
           (_, duration) <- timeAction reprocessVotes
           now <- liftIO getPOSIXTime
-          liftIO $ setGauge (fromRational . toRational $ now) lr
-          liftIO $ setGauge duration rd
+          liftIO $ setGauge lr (fromRational . toRational $ now)
+          liftIO $ setGauge rd duration
           $(logInfo) "Rebuild complete."
 
   -- (items, votes) <- runDB reprocessVotes

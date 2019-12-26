@@ -14,18 +14,18 @@ import           System.Random.Shuffle (shuffle')
 import           Vote (processVote, encryptBallot, decryptBallot)
 
 getVoteR :: IsaacVersion -> Handler TypedContent
-getVoteR ver = observeHandlerL metricBallots (show ver) $ do
+getVoteR ver = observeHandlerL metricBallots (T.pack (show ver)) $ do
   items <- runDB $ E.select $ E.from $ \item -> do
     E.where_ $ item E.^. ItemVersion E.==. E.val ver
     return $ item E.^. ItemIsaacId
-  gen <- lift newStdGen
+  gen <- liftIO newStdGen
   let E.Value leftId:E.Value rightId:_ = shuffle' items (length items) gen
-  (Just (Entity _ left), Just (Entity _ right)) <- runDB $
-                  (,) <$> getBy (UniqueItem ver leftId)
-                      <*> getBy (UniqueItem ver rightId)
+  (Entity _ left, Entity _ right) <- runDB $
+    (,) <$> getBy404 (UniqueItem ver leftId)
+        <*> getBy404 (UniqueItem ver rightId)
   alreadyExpired
   addHeader "Cache-Control" "private, no-cache, must-revalidate"
-  timestamp <- lift getCurrentTime
+  timestamp <- liftIO getCurrentTime
   ballotLeft <- encryptBallot timestamp leftId rightId
   ballotRight <- encryptBallot timestamp rightId leftId
   let ballotJson = object
@@ -42,7 +42,7 @@ getVoteR ver = observeHandlerL metricBallots (show ver) $ do
     provideJson ballotJson
 
 postVoteR :: IsaacVersion -> Handler TypedContent
-postVoteR ver = observeHandlerL metricVotes (show ver) $ do
+postVoteR ver = observeHandlerL metricVotes (T.pack (show ver)) $ do
   request <- waiRequest
   let value = T.pack . BC.unpack <$> lookup "X-Forwarded-For" (Wai.requestHeaders request)
       voter = maybe
@@ -50,7 +50,7 @@ postVoteR ver = observeHandlerL metricVotes (show ver) $ do
               (T.stripStart . T.stripEnd . unsafeLast . T.splitOn ",")
               value
   ballot <- runInputPost $ ireq textField "ballot"
-  timestamp <- lift getCurrentTime
+  timestamp <- liftIO getCurrentTime
   (winner, loser) <- decryptBallot timestamp ballot
   runDB (processVote ver winner loser timestamp voter ballot)
   getVoteR ver

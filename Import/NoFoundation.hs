@@ -3,6 +3,7 @@ module Import.NoFoundation
     ) where
 
 import ClassyPrelude.Yesod   as Import
+import Control.Monad.Fail    as Import (MonadFail())
 import Model                 as Import
 import Settings              as Import
 import Settings.StaticFiles  as Import

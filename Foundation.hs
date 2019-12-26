@@ -13,10 +13,10 @@ import           Yesod.Core.Types (Logger)
 import           Yesod.EmbeddedStatic (EmbeddedStatic, embedStaticContent)
 
 data AppMetrics = AppMetrics
-  { metricBallots             :: P.Metric (P.Vector P.Label1 P.Histogram)
-  , metricVotes               :: P.Metric (P.Vector P.Label1 P.Histogram)
-  , metricLastRebuild         :: P.Metric P.Gauge
-  , metricRebuildDuration     :: P.Metric P.Gauge
+  { metricBallots             :: P.Vector P.Label1 P.Histogram
+  , metricVotes               :: P.Vector P.Label1 P.Histogram
+  , metricLastRebuild         :: P.Gauge
+  , metricRebuildDuration     :: P.Gauge
   }
 
 data App = App
@@ -44,7 +44,7 @@ mkMessage "App" "messages" "en"
 -- explanation for this split.
 mkYesodData "App" $(parseRoutesFile "config/routes")
 
-type Form x = Html -> MForm (HandlerT App IO) (FormResult x, Widget)
+type Form x = Html -> MForm (HandlerFor App) (FormResult x, Widget)
 
 -- Please see the documentation for the Yesod typeclass. There are a number
 -- of settings which can be configured by overriding methods here.
@@ -88,8 +88,8 @@ instance Yesod App where
 
     -- What messages should be logged. The following includes all messages when
     -- in development, and warnings and errors in production.
-    shouldLog app _source level =
-        appShouldLogAll (appSettings app)
+    shouldLogIO app _source level =
+        return $ appShouldLogAll (appSettings app)
             || level == LevelInfo
             || level == LevelWarn
             || level == LevelError

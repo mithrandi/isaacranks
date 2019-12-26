@@ -17,7 +17,7 @@ import           Model.IsaacVersion
 import qualified Network.Wreq as W
 import qualified Network.Wreq.Session as S
 import qualified Text.XML as XML
-import           Text.XML.Lens (root, el, attr, attributeIs, attributeSatisfies, (./), localName)
+import           Text.XML.Lens (root, el, attr, attributeIs, attributeSatisfies, (...), localName)
 import           URI.ByteString (parseURI, strictURIParserOptions, pathL, URI(), serializeURIRef')
 
 pools :: [(Text, IsaacPool)]
@@ -38,10 +38,10 @@ pools =
   ]
 
 itemsFor :: Text -> Traversal' XML.Document XML.Element
-itemsFor name = root . el "ItemPools" ./ el "Pool" . attributeIs "Name" name ./ el "Item"
+itemsFor name = root . el "ItemPools" ... el "Pool" . attributeIs "Name" name ... el "Item"
 
 items :: Traversal' XML.Document XML.Element
-items = root ./ filtered ((`elem` ["active", "passive", "familiar"]) . XML.elementName) . attributeSatisfies "description" (not . T.null)
+items = root ... filtered ((`elem` ["active", "passive", "familiar"]) . XML.elementName) . attributeSatisfies "description" (not . T.null)
 
 wikiBase :: URI
 Right wikiBase = parseURI strictURIParserOptions
@@ -86,7 +86,8 @@ loadData :: String -> FilePath -> FilePath -> ReaderT SqlBackend (LoggingT IO) (
 loadData ver itemsPath poolsPath = do
   let Just ver' = fromPathPiece (_Text # ver) :: Maybe IsaacVersion
   itemsDoc <- liftIO $ XML.readFile def itemsPath
-  parsedItems <- liftIO $ S.withAPISession $ \sess ->
+  sess <- liftIO S.newAPISession
+  parsedItems <- liftIO $
     for (itemsDoc ^.. items) $ \item -> do
       let name = item ^?! attr "name"
           desc = item ^?! attr "description"
