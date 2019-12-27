@@ -1,6 +1,7 @@
 .git/
 .stack-work/
 dist/
+dist-newstyle/
 isaacranks.cabal
 node_modules/
 static/js/

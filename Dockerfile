@@ -5,19 +5,26 @@ RUN yarn install --frozen-lockfile
 COPY ["js/", "/src/js"]
 RUN yarn run build
 
-FROM fpco/stack-build:lts-8.20 as server
-COPY ["stack.yaml", "/src/"]
+FROM haskell:8.8 as server
+RUN apt-get update && env DEBIAN_FRONTEND='noninteractive' apt-get install -y \
+ libpq-dev \
+ && rm -rf /var/lib/apt/lists/*
+RUN cabal v2-update
+RUN cabal v2-install --enable-split-sections hpack
 WORKDIR /src
-RUN stack setup
-COPY ["package.yaml", "/src/"]
-RUN stack build --only-dependencies
+COPY ["package.yaml", "cabal.project.local", "/src/"]
+RUN hpack
+RUN cabal v2-build --only-dependencies --enable-split-sections
 RUN mkdir /dist
 COPY [".", "/src/"]
 COPY --from=client ["/src/static/js", "/src/static/js/"]
-RUN stack --local-bin-path /dist build --copy-bins
+RUN cabal v2-build
+RUN find dist-newstyle/build/x86_64-linux -type f -perm -u=x -print0 \
+        | xargs -0 cp -t /dist
 
-FROM debian:stretch
+FROM debian:stretch-slim
 RUN apt-get update && env DEBIAN_FRONTEND='noninteractive' apt-get install -y \
  libpq5 \
+ libgmp10 \
  && rm -rf /var/lib/apt/lists/*
 COPY --from=server ["/dist/isaacranks", "/dist/load-data", "/dist/rebuildranks", "/usr/local/bin/"]
