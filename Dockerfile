@@ -15,11 +15,11 @@ WORKDIR /src
 COPY ["package.yaml", "cabal.project.local", "/src/"]
 RUN hpack
 RUN cabal v2-build --only-dependencies --enable-split-sections
-RUN mkdir /dist
 COPY [".", "/src/"]
 COPY --from=client ["/src/static/js", "/src/static/js/"]
 RUN cabal v2-build
-RUN find dist-newstyle/build/x86_64-linux -type f -perm -u=x -print0 \
+RUN mkdir /dist2 \
+        && find dist-newstyle/build/x86_64-linux -type f -perm -u=x -print0 \
         | xargs -0 cp -t /dist2
 
 FROM debian:stretch-slim
