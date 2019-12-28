@@ -20,11 +20,11 @@ COPY [".", "/src/"]
 COPY --from=client ["/src/static/js", "/src/static/js/"]
 RUN cabal v2-build
 RUN find dist-newstyle/build/x86_64-linux -type f -perm -u=x -print0 \
-        | xargs -0 cp -t /dist
+        | xargs -0 cp -t /dist2
 
 FROM debian:stretch-slim
 RUN apt-get update && env DEBIAN_FRONTEND='noninteractive' apt-get install -y \
  libpq5 \
  libgmp10 \
  && rm -rf /var/lib/apt/lists/*
-COPY --from=server ["/dist/isaacranks", "/dist/load-data", "/dist/rebuildranks", "/usr/local/bin/"]
+COPY --from=server ["/dist2/isaacranks", "/dist2/load-data", "/dist2/rebuildranks", "/usr/local/bin/"]
