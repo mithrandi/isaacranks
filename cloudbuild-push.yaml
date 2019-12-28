@@ -1,7 +1,9 @@
 steps:
 - name: 'gcr.io/kaniko-project/executor:latest'
   args:
-  - --destination=gcr.io/$PROJECT_ID/isaacranks:git-$REVISION_ID
+  - --destination=eu.gcr.io/$PROJECT_ID/isaacranks:git-$REVISION_ID
   - --cache=true
   - --cache-ttl=336h
 timeout: 1h
+options:
+ machineType: 'N1_HIGHCPU_8'
