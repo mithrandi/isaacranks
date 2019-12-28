@@ -1,0 +1,6 @@
+steps:
+- name: 'gcr.io/kaniko-project/executor:latest'
+  args:
+  - --destination=gcr.io/$PROJECT_ID/isaacranks:$TAG_NAME
+  - --cache=true
+  - --cache-ttl=2w
