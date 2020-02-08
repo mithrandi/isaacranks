@@ -1,4 +1,4 @@
-module Handler.Donate where
+module Handler.Donate (getDonateR) where
 
 import Import
 

@@ -15,3 +15,4 @@ static/js/bundle.js
 static/js/bundle.js.map
 static/tmp/
 yesod-devel/
+/.ghc.environment.*

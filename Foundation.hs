@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Foundation where
 
 import           Database.Persist.Sql (ConnectionPool, runSqlPool)

@@ -1,19 +1,27 @@
-module Vote where
+module Vote
+  ( processVote,
+    reprocessVotes,
+    encryptBallot,
+    decryptBallot,
+  )
+where
 
-import           Conduit (foldlC, mapC)
-import           Control.Lens
-import           Control.Monad.Trans.Reader (ReaderT)
-import           Data.Binary.Get (runGet, getWord32be)
-import           Data.Binary.Put (runPut, putWord32be)
+import Conduit (foldlC, mapC)
+import Control.Lens
+import Control.Monad.Trans.Reader (ReaderT)
+import Data.Binary.Get (getWord32be, runGet)
+import Data.Binary.Put (putWord32be, runPut)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.Map.Strict as M
 import qualified Data.Text as T
-import           Data.Time (getCurrentTime, UTCTime, NominalDiffTime, addUTCTime)
-import           Data.Time.Clock.POSIX (posixSecondsToUTCTime, utcTimeToPOSIXSeconds)
-import           Database.Persist.Sql (SqlBackend)
-import           Import
-import           Model.IsaacVersion
+import Data.Time (NominalDiffTime, UTCTime, addUTCTime, getCurrentTime)
+import Data.Time.Clock.POSIX (posixSecondsToUTCTime, utcTimeToPOSIXSeconds)
+import Database.Persist.Sql (SqlBackend)
+import Import hiding (toList)
+import Model.IsaacVersion
+import Numeric.LinearAlgebra
+import Ranks
 import qualified Web.ClientSession as WS
 
 processVote :: (MonadIO m) => IsaacVersion -> Int -> Int -> UTCTime -> Text -> Text -> ReaderT SqlBackend m ()
@@ -30,34 +38,42 @@ reprocessVotes = do
   bms <- runConduit $ selectSource [] [] .| mapC entityVal .| beatMatrix
   recalculatePairs items bms
   now <- liftIO getCurrentTime
-  deleteWhere [BallotTimestamp <=. (-validTime) `addUTCTime` now]
+  deleteWhere [BallotTimestamp <=. (- validTime) `addUTCTime` now]
   return ()
 
 type Matchup = (Key Item, Key Item)
+
 type BeatMatrix = M.Map Matchup Int
 
 beatMatrix :: Monad m => ConduitT Vote o m (M.Map IsaacVersion BeatMatrix)
 beatMatrix = foldlC upd M.empty
-  where upd bm v = over (at ver . non M.empty . at (w, l) . non 0) (+1) bm
-          where w = v ^. voteWinner
-                l = v ^. voteLoser
-                ver = v ^. voteVersion
+  where
+    upd bm v = bm & at ver . non M.empty . at (w, l) . non 0 +~ 1
+      where
+        w = v ^. voteWinner
+        l = v ^. voteLoser
+        ver = v ^. voteVersion
 
-ranks :: BeatMatrix -> [Key Item] -> [Key Item]
-ranks bm items = smooth (sortOn (negate . wins) items)
-  where wins i = length . filter (>0) . map (result i) $ items
-        result i1 i2 = bm ^. at (i1, i2) . non 0
-        smooth (i1:i2:is) | result i1 i2 < result i2 i1 = i2:smooth (i1:is)
-                          | otherwise                   = i1:smooth (i2:is)
-        smooth is = is
+ranks :: BeatMatrix -> [Key Item] -> [(Key Item, R)]
+ranks bm items =
+  zip items . toList $ ilsrPairwise bm' 0.01
+  where
+    n = length items
+    itemToIdx = M.fromList (zip items [0 ..])
+    bm' = assoc (n, n) 0 (convR <$> M.toList bm)
+    convR ((w, l), s) = ((itemToIdx M.! w, itemToIdx M.! l), fromIntegral s)
 
 recalculatePairs :: (MonadIO m, MonadResource m) => M.Map (Key Item) Item -> M.Map IsaacVersion BeatMatrix -> ReaderT SqlBackend m ()
 recalculatePairs items bms =
   ifor_ bms $ \ver bm ->
-    ifor_ (ranks bm (itemsFor ver items)) $ \rank itemId ->
-      update itemId [ ItemRating =. -(fromIntegral rank)
-                    , ItemVotes =. sumOf (ifolded.ifiltered (\(i1, i2) _ -> i1 == itemId || i2 == itemId)) bm]
-  where itemsFor ver = findIndicesOf ifolded (\i -> i ^. itemVersion == ver)
+    for_ (ranks bm (itemsFor ver items)) $ \(itemId, rating) ->
+      update
+        itemId
+        [ ItemRating =. rating,
+          ItemVotes =. sumOf (ifolded . ifiltered (\(i1, i2) _ -> i1 == itemId || i2 == itemId)) bm
+        ]
+  where
+    itemsFor ver = findIndicesOf ifolded (\i -> i ^. itemVersion == ver)
 
 encodeBallot :: UTCTime -> Int -> Int -> B.ByteString
 encodeBallot expiry winner loser = toStrict . runPut $ do
@@ -67,13 +83,16 @@ encodeBallot expiry winner loser = toStrict . runPut $ do
 
 decodeBallot :: B.ByteString -> (UTCTime, Int, Int)
 decodeBallot = go . fromStrict
-  where go = runGet $ do
-          expiry <- getWord32be
-          winner <- getWord32be
-          loser <- getWord32be
-          return ( posixSecondsToUTCTime (fromIntegral expiry)
-                 , fromIntegral winner
-                 , fromIntegral loser)
+  where
+    go = runGet $ do
+      expiry <- getWord32be
+      winner <- getWord32be
+      loser <- getWord32be
+      return
+        ( posixSecondsToUTCTime (fromIntegral expiry),
+          fromIntegral winner,
+          fromIntegral loser
+        )
 
 -- 1 hour
 validTime :: NominalDiffTime
@@ -88,8 +107,10 @@ encryptBallot now winner loser = do
 decryptBallot :: UTCTime -> Text -> Handler (Int, Int)
 decryptBallot now b = do
   key <- getsYesod appBallotKey
-  let Just b' = WS.decrypt key (BC.pack . T.unpack $ b)
-      (expiry, winner, loser) = decodeBallot b'
+  (expiry, winner, loser) <-
+    case decodeBallot <$> (WS.decrypt key . BC.pack . T.unpack) b of
+      Just r -> pure r
+      Nothing -> error "invalid ballot!"
   if expiry < now
     then error "expired ballot!"
     else return (winner, loser)

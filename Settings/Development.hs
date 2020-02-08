@@ -1,10 +1,10 @@
-module Settings.Development where
+module Settings.Development (development, production) where
 
 import Prelude
 
 development :: Bool
 development =
-#if DEVELOPMENT
+#ifdef DEVELOPMENT
   True
 #else
   False

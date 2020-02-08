@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Handler.Common where
 
 import Data.FileEmbed (embedFile)

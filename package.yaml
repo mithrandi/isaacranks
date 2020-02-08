@@ -7,6 +7,7 @@ dependencies:
 default-extensions:
   - CPP
   - DeriveDataTypeable
+  - DerivingStrategies
   - EmptyDataDecls
   - FlexibleContexts
   - FlexibleInstances
@@ -20,8 +21,10 @@ default-extensions:
   - QuasiQuotes
   - RankNTypes
   - RecordWildCards
+  - StandaloneDeriving
   - TemplateHaskell
   - TupleSections
+  - TypeApplications
   - TypeFamilies
   - UndecidableInstances
   - ViewPatterns
@@ -36,6 +39,7 @@ library:
   - Model
   - Model.IsaacVersion
   - Model.IsaacPool
+  - Ranks
   - Settings
   - Settings.StaticFiles
   - Settings.Development
@@ -65,6 +69,7 @@ library:
   - fast-logger >=3.0
   - file-embed
   - hjsmin >=0.1
+  - hmatrix
   - http-conduit >=2.1
   - http-types
   - lens
@@ -84,6 +89,7 @@ library:
   - text >=0.11
   - time
   - uri-bytestring >=0.1
+  - vector
   - wai
   - wai-extra >=3.0
   - wai-logger >=2.2
@@ -109,7 +115,17 @@ library:
       cpp-options: -DDEVELOPMENT
     else:
       ghc-options:
+      - -Werror
       - -Wall
+      - -Wcompat
+      - -Wincomplete-record-updates
+      - -Wincomplete-uni-patterns
+      - -Wredundant-constraints
+      - -Wmissing-home-modules
+      - -Widentities
+      - -Wcpp-undef
+      - -Wmissing-export-lists
+      - -Wmonomorphism-restriction
       - -fwarn-tabs
       - -O2
 executables:

@@ -17,8 +17,8 @@ import qualified Network.Wai as Wai
 import qualified Prometheus as Prom
 import qualified System.Clock as Clock
 
-instance Prom.MonadMonitor (HandlerFor site) where
-  doIO = liftIO
+-- instance Prom.MonadMonitor (HandlerFor site) where
+--   doIO = liftIO
 
 -- | Core information about HTTP requests:
 --
@@ -58,17 +58,25 @@ instrumentApp metric handler app req resp = do
       end <- Clock.getTime Clock.Monotonic
       let latency = fromRational . (/ 1000000000) . toRational . Clock.toNanoSecs $
             end `Clock.diffTimeSpec` start
-      Prom.withLabel metric (handler, method, T.pack status) (flip Prom.observe latency)
+      Prom.withLabel metric (handler, method, T.pack status) (`Prom.observe` latency)
       where
         method = E.decodeUtf8With lenientDecode (Wai.requestMethod req)
         status = show statusCode
 
+observeDuration ::
+  (MonadIO m, Prom.Observer metric) =>
+  metric -> m a -> m a
+observeDuration metric io = do
+    (result, duration) <- timeAction io
+    liftIO $ Prom.observe metric duration
+    return result
+
 observeDurationL ::
-  (MonadIO m, Prom.MonadMonitor m, Prom.Observer metric, Prom.Label l) =>
+  (MonadIO m, Prom.Observer metric, Prom.Label l) =>
   Prom.Vector l metric -> l -> m a -> m a
 observeDurationL metric label io = do
     (result, duration) <- timeAction io
-    liftIO $ Prom.withLabel metric label (flip Prom.observe duration)
+    liftIO $ Prom.withLabel metric label (`Prom.observe` duration)
     return result
 
 
@@ -85,7 +93,7 @@ timeAction io = do
 observeHandler ::
   Prom.Observer metric =>
   (AppMetrics -> metric) -> HandlerFor App a -> HandlerFor App a
-observeHandler m h = getsYesod (m . appMetrics) >>= flip Prom.observeDuration h
+observeHandler m h = getsYesod (m . appMetrics) >>= (`observeDuration` h)
 
 
 observeHandlerL ::

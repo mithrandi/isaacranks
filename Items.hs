@@ -7,6 +7,7 @@ import           Control.Monad.Logger (LoggingT)
 import           Control.Monad.Trans.Reader (ReaderT)
 import           Data.ByteString.Lens (unpackedChars)
 import           Data.Default (def)
+import           Data.Either (fromRight)
 import qualified Data.Text as T
 import           Data.Text.Lens (unpacked, _Text)
 import           Data.Traversable (for)
@@ -44,7 +45,7 @@ items :: Traversal' XML.Document XML.Element
 items = root ... filtered ((`elem` ["active", "passive", "familiar"]) . XML.elementName) . attributeSatisfies "description" (not . T.null)
 
 wikiBase :: URI
-Right wikiBase = parseURI strictURIParserOptions
+wikiBase = fromRight (error "wikibase") $ parseURI strictURIParserOptions
   "http://bindingofisaacrebirth.gamepedia.com/"
 
 wikiName :: Text -> Int -> Text
@@ -84,7 +85,7 @@ wikiName name iid = case name of
 
 loadData :: String -> FilePath -> FilePath -> ReaderT SqlBackend (LoggingT IO) ()
 loadData ver itemsPath poolsPath = do
-  let Just ver' = fromPathPiece (_Text # ver) :: Maybe IsaacVersion
+  Just ver' <- pure $ fromPathPiece @IsaacVersion (_Text # ver)
   itemsDoc <- liftIO $ XML.readFile def itemsPath
   sess <- liftIO S.newAPISession
   parsedItems <- liftIO $

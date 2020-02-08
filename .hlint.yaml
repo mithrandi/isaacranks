@@ -1,0 +1,14 @@
+- arguments:
+  - -XArrows
+  - -XConstraintKinds
+  - -XDeriveGeneric
+  - -XGeneralizedNewtypeDeriving
+  - -XLambdaCase
+  - -XOverloadedStrings
+  - -XQuasiQuotes
+  - -XRecordWildCards
+  - -XScopedTypeVariables
+  - -XStandaloneDeriving
+  - -XTupleSections
+  - -XTypeApplications
+  - -XViewPatterns
