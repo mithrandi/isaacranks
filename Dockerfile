@@ -7,8 +7,9 @@ RUN yarn run build
 
 FROM haskell:8.8 as server
 RUN apt-get update && env DEBIAN_FRONTEND='noninteractive' apt-get install -y \
- libpq-dev \
- && rm -rf /var/lib/apt/lists/*
+        libpq-dev \
+        libopenblas-dev \
+        && rm -rf /var/lib/apt/lists/*
 RUN cabal v2-update
 RUN cabal v2-install --enable-split-sections hpack
 WORKDIR /src
@@ -17,14 +18,15 @@ RUN hpack
 RUN cabal v2-build --only-dependencies --enable-split-sections
 COPY [".", "/src/"]
 COPY --from=client ["/src/static/js", "/src/static/js/"]
-RUN cabal v2-build
+RUN cabal v2-build --enable-split-sections --ghc-option=-Wwarn
 RUN mkdir /dist2 \
         && find dist-newstyle/build/x86_64-linux -type f -perm -u=x -print0 \
         | xargs -0 cp -t /dist2
 
 FROM debian:stretch-slim
 RUN apt-get update && env DEBIAN_FRONTEND='noninteractive' apt-get install -y \
- libpq5 \
- libgmp10 \
- && rm -rf /var/lib/apt/lists/*
+        libpq5 \
+        libgmp10 \
+        libopenblas-base \
+        && rm -rf /var/lib/apt/lists/*
 COPY --from=server ["/dist2/isaacranks", "/dist2/load-data", "/dist2/rebuildranks", "/usr/local/bin/"]
